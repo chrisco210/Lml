@@ -1,4 +1,4 @@
-MODULES= lambdaast interp ast convert
+MODULES= lambdaast interp ast convert pprint
 OBJECTS=$(MODULES:=.cmo)
 MLS=$(MODULES:=.ml)
 MLIS=$(MODULES:=.mli)

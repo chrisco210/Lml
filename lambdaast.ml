@@ -1,3 +1,5 @@
+(* The AST of De Bruijn lambda calculus extended with integers *)
+
 type bop = 
   | Plus 
   | Minus
@@ -9,10 +11,10 @@ type bop =
   | Gt
   | Neq
 
-type var = string
+type var = int
 
 type lamcom = 
   | App of lamcom * lamcom
-  | Abs of var * lamcom
+  | Lam of lamcom
   | Var of var
   | Int of int
