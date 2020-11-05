@@ -4,23 +4,73 @@ open Interp
 
 let id_fun = Lam (Var 0)
 
-(* 𝜆 𝑓 . (𝜆𝑥. 𝑓 (𝜆𝑦. 𝑥 𝑥 𝑦)) (𝜆𝑥. 𝑓 (𝜆𝑦. 𝑥 𝑥 𝑦)) *)
-(* (𝜆𝑥. 𝑓 (𝜆𝑦. 𝑥 𝑥 𝑦) *)
-let partial = 
-  Lam (
+(* Y ≜ 𝜆 𝑓 . (𝜆𝑥. 𝑓 (𝑥 𝑥)) (𝜆𝑥. 𝑓 (𝑥 𝑥)). *)
+(* 𝐺 ≜ 𝜆 𝑓 . 𝜆𝑛. if 𝑛 = 0 then 1 else 𝑛 × (𝑓 (𝑛 − 1)) *)
+
+let ycomb = Lam (
     App (
-      Var 1,
-      (Lam (
-          App(App(Var 1, Var 1), (Var 0))
-        ))
+      (Lam (App (Var 1, App (Var 0, Var 0)))), 
+      (Lam (App (Var 1, App (Var 0, Var 0))))
     )
   )
-let z_com = Lam (App (partial, partial))
+let fact' = Lam (
+    Lam (
+      If (
+        (Bop (Equals, (Var 0), (Int 0))),
+        (Int 1),
+        (Bop 
+           (
+             Times, 
+             (Var 0), 
+             (
+               App (
+                 (Var 1), 
+                 (Bop (Minus, (Var 0), (Int 1)))
+               )
+             )
+           )
+        )
+      )
+    )
+  )
 
-(* 𝐺 ≜ 𝜆 𝑓 . 𝜆𝑛. if 𝑛 = 0 then 1 else 𝑛 × (𝑓 (𝑛 − 1)) *)
-let fact' = Lam (Lam (If ((Bop (Equals, (Var 0), (Int 0))), (Int 1), (Bop (Times, Var 0, App (Var 1, (Bop (Minus, Var 1, Int 1))))))))
+let fact = App (ycomb, fact')
 
-let fact = App (z_com, fact')
+(* lambda f : Int -> Int -> Int. lambda b : Int . lambda e : Int .  if e = 0 then 1 else b * (f b (e - 1)) *)
+
+let pow' = 
+  Lam (
+    Lam (
+      Lam (
+        If (
+          (Bop (Equals, (Var 0), (Int 0))),
+          (Int 1),
+          (Bop (
+              Times,
+              (Var 1),
+              (App (
+                  (App (
+                      (Var 2),
+                      (Var 1)
+                    ),
+                   (Bop (
+                       Minus,
+                       (Var 0),
+                       (Int 1)
+                     )
+                   )
+
+                  )
+                )
+              )
+            )
+          )
+        )
+      )
+    )
+  )
+
+let pow = App (ycomb, pow')
 
 let nested = App (Lam (Lam (Var 1)), Int 4)
 
@@ -50,6 +100,23 @@ let lc_interpret_tests = [
     );
   "First class function test" >:: (fun _ -> 
       App (firstclasssimple, Int 2) |> eval |> assert_equal (Int 8)
+    );
+  "Application involving binary operators" >:: (fun _ -> 
+      App (App (App (id_fun, Lam (Lam (Bop (Plus, Var 1, Var 0)))), Int 4), Int 4) 
+      |> eval 
+      |> assert_equal (Int 8)
+    );
+  "Application of y combinator based function" >:: (fun _ -> 
+      App (fact, (Int 4)) |> eval |> assert_equal (Int 24)
+    );
+  "Application of y combinator based function" >:: (fun _ -> 
+      App (fact, (Int 0)) |> eval |> assert_equal (Int 1)
+    );
+  "Application of y combinator based function" >:: (fun _ -> 
+      App (fact, (Int 8)) |> eval |> assert_equal (Int 40320)
+    );
+  "Two variable y combinator function" >:: (fun _ ->
+      App (App (pow, Int 10), Int 3) |> eval |> assert_equal (Int 1000)
     )
 ]
 

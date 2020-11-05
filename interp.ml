@@ -1,6 +1,8 @@
 open Lambdaast
 open Pprint
 
+(* This interpreter uses de bruijn notation as it is easier *)
+
 (** [shift i c e] Implements the raising function for handling free variables 
     de Bruijn LC
 *)
@@ -35,10 +37,8 @@ let is_val (exp : lamcom) : bool =
 let rec eval (exp : lamcom) : lamcom = 
   match exp with
   (* Beta rule *)
-  | App (Lam e1, e2) when is_val e2-> shift ~-1 0 (eval (sub e1 (shift 1 0 e2) 0))
+  | App (Lam e1, e2) -> shift ~-1 0 (eval (sub e1 (shift 1 0 e2) 0))
   (* Eval on left *)
-  | App (Lam e1, e2) -> let e2' = eval e2 in eval (App (Lam e1, e2'))
-  (* Eval on right *)
   | App (e1, e2) -> let e1' = eval e1 in eval (App (e1', e2))
   (* Values step to themselves *)
   | Var n -> Var n
