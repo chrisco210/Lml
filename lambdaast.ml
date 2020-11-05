@@ -18,3 +18,6 @@ type lamcom =
   | Lam of lamcom
   | Var of var
   | Int of int
+  | Bool of bool
+  | Bop of bop * lamcom * lamcom
+  | If of lamcom * lamcom * lamcom
