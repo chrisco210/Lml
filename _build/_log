@@ -1,0 +1,28 @@
+### Starting build.
+# Target: lambdaast.ml.depends, tags: { package(oUnit), package(str), package(unix), extension:ml, file:lambdaast.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package unix -package oUnit -package str -modules lambdaast.ml > lambdaast.ml.depends # cached
+# Target: lambdaast.cmo, tags: { package(oUnit), package(str), package(unix), byte, compile, extension:cmo, extension:ml, file:lambdaast.cmo, file:lambdaast.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package unix -package oUnit -package str -o lambdaast.cmo lambdaast.ml # cached
+# Target: interp.mli.depends, tags: { package(oUnit), package(str), package(unix), extension:mli, file:interp.mli, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package unix -package oUnit -package str -modules interp.mli > interp.mli.depends
+# Target: interp.cmi, tags: { package(oUnit), package(str), package(unix), byte, compile, extension:mli, file:interp.mli, interf, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package unix -package oUnit -package str -o interp.cmi interp.mli
+# Target: interp.ml.depends, tags: { package(oUnit), package(str), package(unix), extension:ml, file:interp.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package unix -package oUnit -package str -modules interp.ml > interp.ml.depends
+# Target: interp.cmo, tags: { package(oUnit), package(str), package(unix), byte, compile, extension:cmo, extension:ml, file:interp.cmo, file:interp.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package unix -package oUnit -package str -o interp.cmo interp.ml
+# Target: ast.ml.depends, tags: { package(oUnit), package(str), package(unix), extension:ml, file:ast.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package unix -package oUnit -package str -modules ast.ml > ast.ml.depends
+# Target: ast.cmo, tags: { package(oUnit), package(str), package(unix), byte, compile, extension:cmo, extension:ml, file:ast.cmo, file:ast.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package unix -package oUnit -package str -o ast.cmo ast.ml
+# Target: convert.ml.depends, tags: { package(oUnit), package(str), package(unix), extension:ml, file:convert.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package unix -package oUnit -package str -modules convert.ml > convert.ml.depends
+# Target: convert.cmo, tags: { package(oUnit), package(str), package(unix), byte, compile, extension:cmo, extension:ml, file:convert.cmo, file:convert.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package unix -package oUnit -package str -o convert.cmo convert.ml
+# Target: main.ml.depends, tags: { package(oUnit), package(str), package(unix), extension:ml, file:main.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package unix -package oUnit -package str -modules main.ml > main.ml.depends # cached
+# Target: main.cmo, tags: { package(oUnit), package(str), package(unix), byte, compile, extension:cmo, extension:ml, file:main.cmo, file:main.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package unix -package oUnit -package str -o main.cmo main.ml # cached
+# Target: main.byte, tags: { package(oUnit), package(str), package(unix), byte, dont_link_with, extension:byte, file:main.byte, link, ocaml, program, quiet, traverse }
+ocamlfind ocamlc -linkpkg -package unix -package oUnit -package str main.cmo -o main.byte # cached
+# Compilation successful.
