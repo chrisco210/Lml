@@ -2,17 +2,20 @@ open OUnit2
 open Lambdaast
 open Interp
 
+(* Just the identity function *)
 let id_fun = Lam (Var 0)
 
 (* Y ≜ 𝜆 𝑓 . (𝜆𝑥. 𝑓 (𝑥 𝑥)) (𝜆𝑥. 𝑓 (𝑥 𝑥)). *)
 (* 𝐺 ≜ 𝜆 𝑓 . 𝜆𝑛. if 𝑛 = 0 then 1 else 𝑛 × (𝑓 (𝑛 − 1)) *)
-
+(* We use the Y combinator because we implemented call by name semantics *)
 let ycomb = Lam (
     App (
       (Lam (App (Var 1, App (Var 0, Var 0)))), 
       (Lam (App (Var 1, App (Var 0, Var 0))))
     )
   )
+
+(* The fixed point of this function is the factorial function *)
 let fact' = Lam (
     Lam (
       If (
@@ -36,8 +39,7 @@ let fact' = Lam (
 
 let fact = App (ycomb, fact')
 
-(* lambda f : Int -> Int -> Int. lambda b : Int . lambda e : Int .  if e = 0 then 1 else b * (f b (e - 1)) *)
-
+(* The fixed point of this raises a base to an exponent  *)
 let pow' = 
   Lam (
     Lam (
@@ -72,11 +74,43 @@ let pow' =
 
 let pow = App (ycomb, pow')
 
+(* Nested function *)
 let nested = App (Lam (Lam (Var 1)), Int 4)
-
 let deepnested = Lam (Lam (Lam (Lam (Var 2))))
 
+(* Simple first class function application and evaluation *)
 let firstclasssimple = App (Lam (Lam (App (Var 1, (App (Var 1, Var 0))))), Lam (Bop (Times, Int 2, Var 0)))
+
+
+(* Standard boolean encodings  *)
+let enc_true = Lam (Lam (Var 1))
+let enc_false = Lam (Lam (Var 0))
+let enc_not = Lam (App (App (Var 0, enc_false), enc_true))
+let enc_and = Lam (Lam (App (App (Var 1, Var 0), enc_false)))
+let enc_or = Lam (Lam (App (App (Var 1, enc_true), Var 0)))
+
+(* Generates a church numeral for n *)
+let church (n : int): lamcom = 
+  let rec church' (i : int) : lamcom =
+    match i with 
+    | 0 -> (Var 0)
+    | k -> App (Var 1, church' (k - 1))
+  in 
+  Lam (Lam (church' n))
+
+(* Imnplements the standard church successor function *)
+let church_succ  =
+  Lam (Lam (Lam (App (Var 1, App (App (Var 2, Var 1), Var 0)))))
+
+(* Implements standard church addition *)
+let church_add = 
+  Lam (Lam (App (App (Var 1, church_succ), Var 0)))
+
+(* Convert a church numeral to an integer to make testing equivalence easier *)
+let church_to_int (n : lamcom) : int =
+  match eval (App (App (n, Lam (Bop (Plus, Int 1, Var 0))), Int 0)) with 
+  | Int n -> n
+  | _ -> failwith "Not church numeral"
 
 let lc_interpret_tests = [
   "Identity function is value" >:: (fun _ ->
@@ -117,7 +151,28 @@ let lc_interpret_tests = [
     );
   "Two variable y combinator function" >:: (fun _ ->
       App (App (pow, Int 10), Int 3) |> eval |> assert_equal (Int 1000)
-    )
+    );
+  "Encoded booleans application example" >:: (fun _ -> 
+      App (App (enc_or, enc_true), enc_false) |> eval |> assert_equal (enc_true)
+    );
+  "Encoded booleans application example" >:: (fun _ -> 
+      App (App (enc_or, enc_true), enc_true) |> eval |> assert_equal (enc_true)
+    );
+  "Encoded booleans application example" >:: (fun _ -> 
+      App (App (enc_and, App (App (enc_or, enc_true), enc_true)), enc_false) |> eval |> assert_equal (enc_false)
+    );
+  "Encoded booleans application example" >:: (fun _ -> 
+      App (enc_not, App (App (enc_and, App (App (enc_or, enc_true), enc_true)), enc_false)) |> eval |> assert_equal (enc_true)
+    );
+  "Church addition" >:: (fun _ -> 
+      App (App (church_add, church 3), church 2) |> eval |> church_to_int |> assert_equal 5
+    );
+  "Church addition" >:: (fun _ -> 
+      App (App (church_add, church 3), church 0) |> eval |> church_to_int |> assert_equal 3
+    );
+  "Church addition" >:: (fun _ -> 
+      App (App (church_add, church 55), church 33) |> eval |> church_to_int |> assert_equal (55 + 33)
+    );
 ]
 
 

@@ -2,25 +2,27 @@ open Interp
 open Lambdaast
 open Pprint
 
-let id_fun = (Lam (Var 0))
 
 
-let partial = 
-  Lam (
-    App (
-      Var 1,
-      App (
-        Var 0,
-        Var 0
-      )
-    )
-  )
 
-let y_com = Lam (App (partial, partial))
+let church (n : int): lamcom = 
+  let rec church' (i : int) : lamcom =
+    match i with 
+    | 0 -> (Var 0)
+    | k -> App (Var 1, church' (k - 1))
+  in 
+  Lam (Lam (church' n))
 
-(* 𝐺 ≜ 𝜆 𝑓 . 𝜆𝑛. if 𝑛 = 0 then 1 else 𝑛 × (𝑓 (𝑛 − 1)) *)
-let fact' = Lam (Lam (If ((Bop (Equals, (Var 0), (Int 0))), (Int 1), (Bop (Times, (Var 0), (App (Var 1, (Bop (Minus, (Var 1), (Int 1))))))))))
+let church_succ  =
+  Lam (Lam (Lam (App (Var 1, App (App (Var 2, Var 1), Var 0)))))
 
-let fact = App (y_com, fact')
+let church_add = 
+  Lam (Lam (App (App (Var 1, church_succ), Var 0)))
 
-let _ = App (App (App (id_fun, Lam (Lam (Bop (Plus, Int 4, Var 0)))), Int 4), Int 4) |>  eval |> string_of_exp |> print_endline
+let church_to_int (n : lamcom) : int =
+  match eval (App (App (n, Lam (Bop (Plus, Int 1, Var 0))), Int 0)) with 
+  | Int n -> n
+  | _ -> failwith "Not church numeral"
+
+let _ = App (App (church_add, church 16), church 32) |>  eval |> church_to_int |> print_int;
+  App (App (church_add, church 1), church 2) |>  eval |> string_of_exp |> print_endline;
