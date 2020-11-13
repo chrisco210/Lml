@@ -2,34 +2,34 @@
 
 type var = string
 
-type com = 
+type expr = 
   (* Regular functional stuff *)
-  | Let of var * com * com
-  | Letg of var * com
-  | If of com * com * com
-  | Tuple of com * com
-  | Fun of (var list) * com
-  | Proj of com * int
+  | Let of var * expr * expr
+  | Letg of var * expr
+  | If of expr * expr * expr
+  | Tuple of expr * expr
+  | Fun of (var list) * expr
+  | Proj of expr * int
 
   (* Operations *)
-  | Bop of com * bop * com
-  | Uop of uop * com
+  | Bop of expr * bop * expr
+  | Uop of uop * expr
 
   (* Imperative features *)
-  | Seq of com * com
-  | Ref of com 
-  | While of com * com
-  | Assign of com * com
+  | Seq of expr * expr
+  | Ref of expr 
+  | While of expr * expr
+  | Assign of expr * expr
   | Break
   | Continue
 
   (* Lambda calculus *)
-  | Abs of var * com
-  | App of com * com
+  | Abs of var * expr
+  | App of expr * expr
 
   (* List operations *)
-  | Hd of com
-  | Tl of com
+  | Hd of expr
+  | Tl of expr
   | Nil
 
   (* Literals *)

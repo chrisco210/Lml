@@ -1,1 +1,2 @@
-true: package(unix), package(oUnit), package(str)
+true: menhir, package(oUnit)
+true: use_menhir

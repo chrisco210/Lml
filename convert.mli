@@ -1,4 +1,4 @@
 open Ast
 open Lambdaast
 
-val convert : com -> lamcom
+val convert : expr -> lamcom

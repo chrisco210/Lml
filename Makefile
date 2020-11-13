@@ -15,10 +15,6 @@ build:
 
 run:
 	$(OCAMLBUILD) $(OBJECTS) $(MAIN) && ./$(MAIN)
-
-zip:
-	zip OScrabble-$(GIT_HASH).zip *.ml* _tags Makefile  *.txt *.md
-
 test:
 	$(OCAMLBUILD) -tag 'debug' $(TEST) && ./$(TEST) -runner sequential
 

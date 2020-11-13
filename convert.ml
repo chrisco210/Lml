@@ -3,4 +3,4 @@
 open Ast
 open Lambdaast
 
-let convert (e : com) : lamcom = failwith "Unimplemented"
+let convert (e : expr) : lamcom = failwith "Unimplemented"
