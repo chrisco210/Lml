@@ -10,9 +10,9 @@ open Ast
 /* Random syntax stuff */
 %token LPAREN
 %token RPAREN
-%token NUMSIGN
+/* %token NUMSIGN */
 %token PERIOD
-%token COMMA
+/* %token COMMA */
 
 
 /* Let expressions */
@@ -70,15 +70,19 @@ open Ast
 /* %nonassoc IN
 %nonassoc ELSE */
 
+%nonassoc LAMBDA
+%nonassoc PERIOD
+
 %left LTEQ
 %left GTEQ
 %left GT
 %left LT
-%left MINUS
-%left EQUALS
 %left NEQ
+%left EQUALS
+%left MINUS
 %left PLUS
 %left TIMES
+
 
 %start <Ast.expr> prog
 
@@ -93,8 +97,8 @@ expr:
   | b = TRUE { Bool true }
   | b = FALSE { Bool false }
 /* Functions */
-  | LAMBDA; v = ID; PERIOD; e = expr {Abs (v, e)}
   | e1 = expr; e2 = expr {App (e1, e2)}
+  | LAMBDA; v = ID; PERIOD; e = expr {Abs (v, e)}
 /* Binops */
   | e1 = expr; LTEQ; e2 = expr {Bop (e1, Lteq, e2)}
   | e1 = expr; GTEQ; e2 = expr {Bop (e1, Gteq, e2)}
@@ -105,4 +109,5 @@ expr:
   | e1 = expr; TIMES; e2 = expr {Bop (e1, Times, e2)}
   | e1 = expr; NEQ; e2 = expr {Bop (e1, Neq, e2)}
   | e1 = expr; EQUALS; e2 = expr {Bop (e1, Equals, e2)}
+  | LPAREN; e=expr; RPAREN {e}
   ;

@@ -36,7 +36,7 @@ type expr =
   | Var of var
   | Int of int
   | Bool of bool
-and bop = 
+and  bop = 
   | Plus 
   | Minus
   | Times
@@ -54,9 +54,22 @@ and uop =
 
 let rec string_of_ast (e : expr) : string = 
   match e with 
-  | Abs (v, e) -> "L " ^ (string_of_ast e)  ^ " . " ^ (string_of_ast e)
+  | Abs (v, e) -> "(L " ^ (v)  ^ " . " ^ (string_of_ast e) ^ ")"
   | App (e1, e2) -> (string_of_ast e1) ^ " " ^ (string_of_ast e2)
   | Var (v) -> v
   | Int (i) -> string_of_int i
   | Bool (b) -> string_of_bool b
+  | Bop (e1, bop, e2) -> "(" ^ (string_of_ast e1) ^ (string_of_bop bop) ^ (string_of_ast e2) ^ ")"
   | _ -> failwith "Unimplemented string_of_ast"
+and string_of_bop (b : bop) : string = 
+  match b with
+  | Plus -> "+"
+  | Minus -> "-"
+  | Equals -> "="
+  | Times -> "*"
+  | Lteq -> "<="
+  | Lt -> "<"
+  | Gteq -> ">="
+  | Gt -> ">"
+  | Neq -> "!="
+  | Cons -> "::"

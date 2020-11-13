@@ -1,9 +1,5 @@
 open Ast
 open Pprint
+open Parse
 
-let parse (s : string) : expr =
-  let lexbuf = Lexing.from_string s in
-  let ast = Parser.prog Lexer.read lexbuf in
-  ast
-
-let _ = "L x . x + 1" |> parse  |> string_of_ast |> print_endline
+let _ = "L x . 1 + 2 + x" |> parse  |> string_of_ast |> print_endline

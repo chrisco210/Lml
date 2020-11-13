@@ -176,6 +176,30 @@ let lc_interpret_tests = [
 ]
 
 
-let suite = "LML tests" >::: List.concat [lc_interpret_tests]
+(* ---------------------- Parser tests --------------------------- *)
+
+open Parse
+open Ast
+
+let make_parse_test (s : string) (e : expr) =
+  s ^ " parses to " ^ (string_of_ast e) >:: (fun _ -> 
+      s |> parse |> assert_equal e
+        ~printer:string_of_ast)
+
+let parse_tests = [
+  make_parse_test "L x.x" (Ast.Abs ("x", Ast.Var "x"));
+  make_parse_test "L    x    .    x" (Ast.Abs ("x", Ast.Var "x"));
+  make_parse_test "L x . x + 1" (Ast.Abs ("x", (Ast.Bop (Ast.Var "x", Ast.Plus, Ast.Int 1))));
+  make_parse_test "L x . 1 + 2 + x" (Ast.Abs ("x", (Ast.Bop (Ast.Bop (Ast.Int 1, Ast.Plus, Ast.Int 2), Ast.Plus, Ast.Var "x"))));
+  make_parse_test "L x . 1 + (2 + x)" (Ast.Abs ("x", (Ast.Bop (Ast.Int 1, Ast.Plus, Ast.Bop (Ast.Int 2, Ast.Plus, Ast.Var "x")))));
+  make_parse_test "L x . L y . x" (Ast.Abs ("x", Ast.Abs ("y", Ast.Var "x")));
+  make_parse_test "(L x . x) L x . x" (Ast.App ((Ast.Abs ("x", Ast.Var "x")), (Ast.Abs ("x", Ast.Var "x"))));
+  make_parse_test "L x . (x L x . x)" (Ast.Abs ("x", Ast.App (Ast.Var "x", Ast.Abs ("x", Var "x"))));
+  make_parse_test "L x . x L x . x" (Ast.Abs ("x", Ast.App (Ast.Var "x", Ast.Abs ("x", Var "x"))));
+  make_parse_test "L x . x x" (Ast.Abs ("x", Ast.App (Ast.Var "x", Ast.Var "x")));
+
+]
+
+let suite = "LML tests" >::: List.concat [lc_interpret_tests; parse_tests]
 
 let _ = run_test_tt_main suite
