@@ -20,3 +20,4 @@ let rec string_of_exp (e : lamcom) : string =
   | Bool b -> string_of_bool b
   | If (b, etrue, efalse) -> "IF " ^ (string_of_exp b) ^ " THEN " ^ (string_of_exp etrue) ^ " ELSE " ^ (string_of_exp efalse)
   | Bop (bop, l, r) -> (string_of_exp l) ^ (string_of_bop bop) ^ (string_of_exp r)
+
