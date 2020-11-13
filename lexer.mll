@@ -25,7 +25,7 @@ rule read =
   | "=" { EQUALS }
   | "!=" { NEQ }
   | "L" {LAMBDA}
-  | "\\." {PERIOD}
+  | "." {PERIOD}
   | id { ID (Lexing.lexeme lexbuf) }
   | int { INT (int_of_string (Lexing.lexeme lexbuf)) }
   | eof { EOF }

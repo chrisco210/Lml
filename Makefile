@@ -8,7 +8,7 @@ OCAMLBUILD=ocamlbuild -use-ocamlfind
 PKGS=unix,oUnit
 GIT_HASH=$(shell git log --pretty=format:'%h' -n 1)
 
-default: build
+default: run
 
 build:
 	$(OCAMLBUILD) $(OBJECTS) $(MAIN)

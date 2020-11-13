@@ -6,4 +6,4 @@ let parse (s : string) : expr =
   let ast = Parser.prog Lexer.read lexbuf in
   ast
 
-let _ = "L x . x" |> parse  |> string_of_ast |> print_endline
+let _ = "L x . x + 1" |> parse  |> string_of_ast |> print_endline
