@@ -55,12 +55,13 @@ and uop =
 let rec string_of_ast (e : expr) : string = 
   match e with 
   | Abs (v, e) -> "(L " ^ (v)  ^ " . " ^ (string_of_ast e) ^ ")"
-  | App (e1, e2) -> (string_of_ast e1) ^ " " ^ (string_of_ast e2)
-  | Var (v) -> v
+  | App (e1, e2) -> "(" ^ (string_of_ast e1) ^ " " ^ (string_of_ast e2) ^ ")"
+  | Var (v) ->  v
   | Int (i) -> string_of_int i
   | Bool (b) -> string_of_bool b
   | Bop (e1, bop, e2) -> "(" ^ (string_of_ast e1) ^ (string_of_bop bop) ^ (string_of_ast e2) ^ ")"
-  | Let (v, e1, e2) -> "let " ^ v ^ " = " ^ (string_of_ast e1) ^ " in " ^ (string_of_ast e2) 
+  | Let (v, e1, e2) -> "(let " ^ v ^ " = " ^ (string_of_ast e1) ^ " in " ^ (string_of_ast e2) ^ ")"
+  | If (e1, e2, e3) -> "if (" ^ (string_of_ast e1) ^ ") then (" ^ (string_of_ast e2) ^ ") else (" ^ (string_of_ast e3) ^ ")"
   | _ -> failwith "Unimplemented string_of_ast"
 and string_of_bop (b : bop) : string = 
   match b with

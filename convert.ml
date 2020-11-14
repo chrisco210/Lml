@@ -31,12 +31,12 @@ let rec convert (e : expr) : lamcom =
     match e with
     | Abs(v,e') -> Lam (convert_var e' (v::s))
     | App(e1,e2) -> App (convert_var e1 s, convert_var e2 s)
-    | Let(v,e1,e2) -> failwith "unimplemented in alpha"
-    | If(e1,e2,e3) -> failwith "unimplemented in alpha"
+    | Let(v,e1,e2) -> convert_var (App (Abs (v, e2), e1)) s
+    | If(e1,e2,e3) -> If (convert_var e1 s, convert_var e2 s, convert_var e3 s)
     | Var(v) -> begin
         match list_posn s v with
         | Some n -> Var n
-        | None -> failwith "Unbound variables are not implemented yet"
+        | None -> failwith "Unbound variables cannot be converted"
       end
     | Int(n) -> Int n
     | Bool(b) -> Bool b

@@ -13,6 +13,9 @@ rule read =
   | white { read lexbuf }
   | "true" { TRUE }
   | "false" { FALSE }
+  | "if" {IF}
+  | "else" {ELSE}
+  | "then" {THEN}
   | "<=" { LTEQ }
   | ">=" { GTEQ }
   | "<" { LT }

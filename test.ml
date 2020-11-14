@@ -206,6 +206,10 @@ let parse_tests = [
   make_parse_test "let x = let y = 5 in y in x" (Ast.Let ("x", (Ast.Let ("y", Ast.Int 5, Ast.Var "y")), Ast.Var "x"));
   make_parse_test "let x = let y = (L x . x) 5 in y in x" (Ast.Let ("x", (Ast.Let ("y", (Ast.App (Ast.Abs ("x", Ast.Var "x"), Ast.Int 5)), Ast.Var "y")), Ast.Var "x"));
   make_parse_test "let x = let y = (L x . x) 5 in y y in x" (Ast.Let ("x", (Ast.Let ("y", (Ast.App (Ast.Abs ("x", Ast.Var "x"), Ast.Int 5)), Ast.App (Ast.Var "y", Ast.Var "y"))), Ast.Var "x"));
+  make_parse_test "if a then b else c" (Ast.If (Ast.Var "a", Ast.Var "b", Ast.Var "c"));
+  (* make_parse_test "(L x . x) 5 < 3" (Bop (App (Abs ("x", Var "x"), Int 5), Lt, Int 3)); *)
+  make_parse_test "f 5 < 3" (Bop (App (Var "f", Int 5), Lt, Int 3));
+  (* make_parse_test "if (L x . x) 5 < 3 then L x . x else L y . y" (If ((Bop (App (Abs ("x", Var "x"), Int 5), Lt, Int 3)), (Abs ("x", Var "x")), (Abs ("y", Var "y")))); *)
 ]
 
 (* ------------------------ Conversion tests ----------------------------------- *)
@@ -238,6 +242,15 @@ let convert_tests = [
      "L x. x L y . L x . x y" |> parse |> convert
      |> assert_equal (Lam (App (Var 0, Lam (Lam (App (Var 0, Var 1))))))
   );
+  "Simple let expression" >:: (fun _ ->
+      "let x = 4 in x" |> parse |> convert
+      |> assert_equal (Lambdaast.App (Lam (Var 0), Int 4))
+    );
+  "Omega conversion" >:: (fun _ ->
+      let partial = Lam (App (Var 0, Var 0)) in
+      "(L x . x x) (L x . x x)" |> parse |> convert
+      |> assert_equal (Lambdaast.App (partial, partial))
+    );
 ]
 
 let suite = "LML tests" >::: List.concat [lc_interpret_tests; parse_tests; convert_tests]

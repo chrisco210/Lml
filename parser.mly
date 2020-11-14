@@ -19,9 +19,9 @@ open Ast
 %token IN
 
 /* (*If statements*) */
-/* %token IF */
-/* %token THEN */
-/* %token ELSE */
+%token IF
+%token THEN
+%token ELSE
 
 /* (*WHile stuff*) */
 /* %token WHILE
@@ -68,14 +68,12 @@ open Ast
 
 %nonassoc PERIOD
 %nonassoc LAMBDA 
-%nonassoc LET
 %nonassoc IN
 
-%nonassoc TRUE FALSE
-%nonassoc INT
-%nonassoc ID
 
-%nonassoc LPAREN
+%nonassoc ELSE
+%nonassoc THEN
+%nonassoc IF
 
 %left LTEQ
 %left GTEQ
@@ -86,6 +84,13 @@ open Ast
 %left PLUS
 %left MINUS
 %left TIMES
+
+
+%nonassoc TRUE FALSE
+%nonassoc INT
+%nonassoc ID
+
+%nonassoc LPAREN
 
 
 %start <Ast.expr> prog
@@ -112,7 +117,8 @@ expr:
   | b = FALSE { Bool false }
   | LAMBDA v = ID PERIOD e = expr {Abs (v, e)}
   | LET v = ID EQUALS e1 = expr IN e2 = expr {Let (v, e1, e2)}
-  | e1 = expr; b = binop; e2 = expr {Bop (e1, b, e2)}
-  | LPAREN; e=expr; RPAREN {e}
+  | IF e1 = expr THEN e2 = expr ELSE e3 = expr {If (e1, e2, e3)}
   | e1 = expr e2 = expr {App (e1, e2)}
+  | e1 = expr b = binop e2 = expr {Bop (e1, b, e2)}
+  | LPAREN e=expr RPAREN {e}
   ;
