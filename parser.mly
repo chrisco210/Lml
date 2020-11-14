@@ -67,6 +67,7 @@ open Ast
 
 %token EOF
 
+%nonassoc PERIOD ELSE IN
 
 %left LTEQ
 %left GTEQ
@@ -81,7 +82,8 @@ open Ast
 /* Thanks to https://ptival.github.io/2017/05/16/parser-generators-and-function-application/
   for how to make function application left associative
  */
-%nonassoc LAMBDA IF ID LPAREN LET INT TRUE FALSE
+/*  PERIOD THEN ELSE IN */
+%nonassoc LAMBDA IF LET LPAREN ID INT TRUE FALSE 
 %nonassoc APP
 
 
