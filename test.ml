@@ -189,6 +189,9 @@ let make_parse_test (s : string) (e : expr) =
 (* Sorry for the long line lengths, I think it looks better this way *)
 (* These programs may or may not be valid, they are just to test the parser *)
 let parse_tests = [
+  make_parse_test "f a b c" (App (App (App (Var "f", Var "a"), Var "b"), Var "c"));
+  make_parse_test "f a (b c)" (App (App (Var "f", Var "a"), App (Var "b", Var "c")));
+  make_parse_test "(L x . x) (L y . y) (L z . z)" (App (App ((Abs ("x", Var "x")), (Abs ("y", Var "y"))), (Abs ("z", Var "z"))));
   make_parse_test "Lx" (Ast.Var "Lx");
   make_parse_test "L x.x" (Ast.Abs ("x", Ast.Var "x"));
   make_parse_test "L    x    .    x" (Ast.Abs ("x", Ast.Var "x"));

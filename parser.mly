@@ -63,17 +63,10 @@ open Ast
 /* %token FUN  */
 /* %token ARROW */
 %token LAMBDA
+%token APP
 
 %token EOF
 
-%nonassoc PERIOD
-%nonassoc LAMBDA 
-%nonassoc IN
-
-
-%nonassoc ELSE
-%nonassoc THEN
-%nonassoc IF
 
 %left LTEQ
 %left GTEQ
@@ -85,12 +78,11 @@ open Ast
 %left MINUS
 %left TIMES
 
-
-%nonassoc TRUE FALSE
-%nonassoc INT
-%nonassoc ID
-
-%nonassoc LPAREN
+/* Thanks to https://ptival.github.io/2017/05/16/parser-generators-and-function-application/
+  for how to make function application left associative
+ */
+%nonassoc LAMBDA IF ID LPAREN LET INT TRUE FALSE
+%nonassoc APP
 
 
 %start <Ast.expr> prog
@@ -118,7 +110,7 @@ expr:
   | LAMBDA v = ID PERIOD e = expr {Abs (v, e)}
   | LET v = ID EQUALS e1 = expr IN e2 = expr {Let (v, e1, e2)}
   | IF e1 = expr THEN e2 = expr ELSE e3 = expr {If (e1, e2, e3)}
-  | e1 = expr e2 = expr {App (e1, e2)}
+  | e1 = expr e2 = expr %prec APP {App (e1, e2)}
   | e1 = expr b = binop e2 = expr {Bop (e1, b, e2)}
   | LPAREN e=expr RPAREN {e}
   ;

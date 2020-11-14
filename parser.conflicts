@@ -1,10 +1,10 @@
 
-** Conflict (shift/reduce) in state 15.
-** Tokens involved: TRUE TIMES PLUS NEQ MINUS LTEQ LT LPAREN LET LAMBDA INT ID GTEQ GT FALSE EQUALS
+** Conflict (shift/reduce) in state 40.
+** Tokens involved: TRUE TIMES PLUS NEQ MINUS LTEQ LT LPAREN LET LAMBDA INT IF ID GTEQ GT FALSE EQUALS
 ** The following explanations concentrate on token TRUE.
 ** This state is reached from prog after reading:
 
-expr expr 
+LET ID EQUALS expr IN expr 
 
 ** The derivations that appear below have the following common factor:
 ** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
@@ -13,16 +13,72 @@ prog
 expr EOF 
 (?)
 
-** In state 15, looking ahead at TRUE, shifting is permitted
+** In state 40, looking ahead at TRUE, shifting is permitted
 ** because of the following sub-derivation:
 
-expr expr 
-     expr expr 
-          . TRUE 
+LET ID EQUALS expr IN expr 
+                      expr expr 
+                           . TRUE 
 
-** In state 15, looking ahead at TRUE, reducing production
-** expr -> expr expr 
+** In state 40, looking ahead at TRUE, reducing production
+** expr -> LET ID EQUALS expr IN expr 
 ** is permitted because of the following sub-derivation:
 
 expr expr // lookahead token appears because expr can begin with TRUE
-expr expr . 
+LET ID EQUALS expr IN expr . 
+
+** Conflict (shift/reduce) in state 37.
+** Tokens involved: TRUE TIMES PLUS NEQ MINUS LTEQ LT LPAREN LET LAMBDA INT IF ID GTEQ GT FALSE EQUALS
+** The following explanations concentrate on token TRUE.
+** This state is reached from prog after reading:
+
+LAMBDA ID PERIOD expr 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+prog 
+expr EOF 
+(?)
+
+** In state 37, looking ahead at TRUE, shifting is permitted
+** because of the following sub-derivation:
+
+LAMBDA ID PERIOD expr 
+                 expr expr 
+                      . TRUE 
+
+** In state 37, looking ahead at TRUE, reducing production
+** expr -> LAMBDA ID PERIOD expr 
+** is permitted because of the following sub-derivation:
+
+expr expr // lookahead token appears because expr can begin with TRUE
+LAMBDA ID PERIOD expr . 
+
+** Conflict (shift/reduce) in state 36.
+** Tokens involved: TRUE TIMES PLUS NEQ MINUS LTEQ LT LPAREN LET LAMBDA INT IF ID GTEQ GT FALSE EQUALS
+** The following explanations concentrate on token TRUE.
+** This state is reached from prog after reading:
+
+IF expr THEN expr ELSE expr 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+prog 
+expr EOF 
+(?)
+
+** In state 36, looking ahead at TRUE, shifting is permitted
+** because of the following sub-derivation:
+
+IF expr THEN expr ELSE expr 
+                       expr expr 
+                            . TRUE 
+
+** In state 36, looking ahead at TRUE, reducing production
+** expr -> IF expr THEN expr ELSE expr 
+** is permitted because of the following sub-derivation:
+
+expr expr // lookahead token appears because expr can begin with TRUE
+IF expr THEN expr ELSE expr . 
