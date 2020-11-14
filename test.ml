@@ -208,6 +208,38 @@ let parse_tests = [
   make_parse_test "let x = let y = (L x . x) 5 in y y in x" (Ast.Let ("x", (Ast.Let ("y", (Ast.App (Ast.Abs ("x", Ast.Var "x"), Ast.Int 5)), Ast.App (Ast.Var "y", Ast.Var "y"))), Ast.Var "x"));
 ]
 
-let suite = "LML tests" >::: List.concat [lc_interpret_tests; parse_tests]
+(* ------------------------ Conversion tests ----------------------------------- *)
+
+open Convert
+
+let convert_tests = [
+  "Converting ID function" >:: (fun _ -> 
+      (Ast.Abs ("x", Ast.Var "x")) |> convert |> assert_equal (Lam (Var 0))
+    );
+  "Nested lambdas" >:: (fun _ -> 
+      (Ast.Abs ("x", Ast.Abs ("y", Ast.App (Ast.Var "x", Ast.Var "y")))) 
+      |> convert |> assert_equal (Lam (Lam (App (Var 1, Var 0))))
+    );
+  "Lambda with binop" >:: (fun _ ->
+      (Ast.Abs ("x", (Ast.Bop (Ast.Var "x", Ast.Plus, Ast.Int 1))))
+      |> convert |> assert_equal (Lam (Bop (Plus, Var 0, Int 1)))
+    );
+  "Lambda with nested binops" >:: (fun _ ->
+      (Ast.Abs ("x", (Ast.Bop (Ast.Bop (Ast.Int 1, Ast.Plus, Ast.Int 2), Ast.Plus, Ast.Var "x"))))
+      |> convert |> assert_equal (Lam (Bop (Plus, Bop (Plus, Int 1, Int 2), Var 0)))
+    );
+  (* We already tested parsing above, so for convenience use parsing in the following tests *)
+  "Lambda with variable redefinition" >:: (fun _ ->
+      "L x . L y . L x . x" |> parse |> convert
+      |> assert_equal (Lam (Lam (Lam (Var 0))))
+    );
+  "Lambda with two different variables with same name at different depths" >::
+  (fun _ ->
+     "L x. x L y . L x . x y" |> parse |> convert
+     |> assert_equal (Lam (App (Var 0, Lam (Lam (App (Var 0, Var 1))))))
+  );
+]
+
+let suite = "LML tests" >::: List.concat [lc_interpret_tests; parse_tests; convert_tests]
 
 let _ = run_test_tt_main suite
