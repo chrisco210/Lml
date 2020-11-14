@@ -187,8 +187,9 @@ let make_parse_test (s : string) (e : expr) =
         ~printer:string_of_ast)
 
 (* Sorry for the long line lengths, I think it looks better this way *)
-(* These programs dont necessarily make sense, they are just to test the parser *)
+(* These programs may or may not be valid, they are just to test the parser *)
 let parse_tests = [
+  make_parse_test "Lx" (Ast.Var "Lx");
   make_parse_test "L x.x" (Ast.Abs ("x", Ast.Var "x"));
   make_parse_test "L    x    .    x" (Ast.Abs ("x", Ast.Var "x"));
   make_parse_test "L x . x + 1" (Ast.Abs ("x", (Ast.Bop (Ast.Var "x", Ast.Plus, Ast.Int 1))));
