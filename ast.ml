@@ -60,6 +60,7 @@ let rec string_of_ast (e : expr) : string =
   | Int (i) -> string_of_int i
   | Bool (b) -> string_of_bool b
   | Bop (e1, bop, e2) -> "(" ^ (string_of_ast e1) ^ (string_of_bop bop) ^ (string_of_ast e2) ^ ")"
+  | Let (v, e1, e2) -> "let " ^ v ^ " = " ^ (string_of_ast e1) ^ " in " ^ (string_of_ast e2) 
   | _ -> failwith "Unimplemented string_of_ast"
 and string_of_bop (b : bop) : string = 
   match b with

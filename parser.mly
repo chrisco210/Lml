@@ -14,10 +14,9 @@ open Ast
 %token PERIOD
 /* %token COMMA */
 
-
 /* Let expressions */
-/* %token LET */
-/* %token IN */
+%token LET
+%token IN
 
 /* (*If statements*) */
 /* %token IF */
@@ -67,11 +66,16 @@ open Ast
 
 %token EOF
 
-/* %nonassoc IN
-%nonassoc ELSE */
-
-%nonassoc LAMBDA
 %nonassoc PERIOD
+%nonassoc LAMBDA 
+%nonassoc LET
+%nonassoc IN
+
+%nonassoc TRUE FALSE
+%nonassoc INT
+%nonassoc ID
+
+%nonassoc LPAREN
 
 %left LTEQ
 %left GTEQ
@@ -79,35 +83,36 @@ open Ast
 %left LT
 %left NEQ
 %left EQUALS
-%left MINUS
 %left PLUS
+%left MINUS
 %left TIMES
 
 
 %start <Ast.expr> prog
 
 %%
+%inline binop:
+  | LTEQ { Lteq }
+  | GTEQ { Gteq }
+  | GT { Gt }
+  | LT { Lt }
+  | MINUS { Minus }
+  | PLUS { Plus }
+  | TIMES { Times }
+  | NEQ { Neq }
+  | EQUALS { Equals }
+  ;
 prog: 
   | e = expr; EOF { e }
   ;
 expr:
-/* Literals */
   | i = INT { Int i }
   | x = ID { Var x }
   | b = TRUE { Bool true }
   | b = FALSE { Bool false }
-/* Functions */
-  | e1 = expr; e2 = expr {App (e1, e2)}
-  | LAMBDA; v = ID; PERIOD; e = expr {Abs (v, e)}
-/* Binops */
-  | e1 = expr; LTEQ; e2 = expr {Bop (e1, Lteq, e2)}
-  | e1 = expr; GTEQ; e2 = expr {Bop (e1, Gteq, e2)}
-  | e1 = expr; GT; e2 = expr {Bop (e1, Gt, e2)}
-  | e1 = expr; LT; e2 = expr {Bop (e1, Lt, e2)}
-  | e1 = expr; MINUS; e2 = expr {Bop (e1, Minus, e2)}
-  | e1 = expr; PLUS; e2 = expr {Bop (e1, Plus, e2)}
-  | e1 = expr; TIMES; e2 = expr {Bop (e1, Times, e2)}
-  | e1 = expr; NEQ; e2 = expr {Bop (e1, Neq, e2)}
-  | e1 = expr; EQUALS; e2 = expr {Bop (e1, Equals, e2)}
+  | LAMBDA v = ID PERIOD e = expr {Abs (v, e)}
+  | LET v = ID EQUALS e1 = expr IN e2 = expr {Let (v, e1, e2)}
+  | e1 = expr; b = binop; e2 = expr {Bop (e1, b, e2)}
   | LPAREN; e=expr; RPAREN {e}
+  | e1 = expr e2 = expr {App (e1, e2)}
   ;

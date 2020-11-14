@@ -1,0 +1,28 @@
+
+** Conflict (shift/reduce) in state 15.
+** Tokens involved: TRUE TIMES PLUS NEQ MINUS LTEQ LT LPAREN LET LAMBDA INT ID GTEQ GT FALSE EQUALS
+** The following explanations concentrate on token TRUE.
+** This state is reached from prog after reading:
+
+expr expr 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+prog 
+expr EOF 
+(?)
+
+** In state 15, looking ahead at TRUE, shifting is permitted
+** because of the following sub-derivation:
+
+expr expr 
+     expr expr 
+          . TRUE 
+
+** In state 15, looking ahead at TRUE, reducing production
+** expr -> expr expr 
+** is permitted because of the following sub-derivation:
+
+expr expr // lookahead token appears because expr can begin with TRUE
+expr expr . 
