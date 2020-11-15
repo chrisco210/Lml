@@ -14,6 +14,7 @@ let rec shift (i : var) (c : int) (e : lamcom) : lamcom =
   | Int n -> Int n
   | Bool b -> Bool b
   | Bop (op, l, r) -> Bop (op, shift i c l, shift i c r)
+  | Uop (op, e) -> Uop (op, shift i c e)
   | If (b, etrue, efalse) -> If (shift i c b, shift i c etrue, shift i c efalse)
 
 (** [sub e1 e2 n] substitutes [e2] for [n] in [e1]*)
@@ -89,4 +90,5 @@ let rec eval (exp : lamcom) : lamcom =
           | Int n -> Int (-n)
           | _ -> failwith ("Neg must take an integer: " ^ string_of_exp (Uop (op, e)))
         end
+      | Deref -> failwith "unimplemented in gamma"
     end
