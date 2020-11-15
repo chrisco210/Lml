@@ -82,7 +82,7 @@ let rec string_of_ast (e : expr) : string =
 and string_of_uop (o : uop) : string =
   match o with
   | Neg -> "~-"
-  | Not -> "not"
+  | Not -> "~"
   | Deref -> "!"
 and string_of_bop (b : bop) : string = 
   match b with

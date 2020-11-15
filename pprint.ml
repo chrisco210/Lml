@@ -12,7 +12,7 @@ let string_of_bop (b : bop) : string = match b with
   | Neq -> "!="
 
 let string_of_uop (u : uop) : string = match u with
-  | Not -> "not"
+  | Not -> "~"
   | Neg -> "~-"
   | Deref -> "!"
 
