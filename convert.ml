@@ -26,6 +26,12 @@ let lambop_of_bop (b : Ast.bop) : Lambdaast.bop =
   | Gt -> Gt
   | Neq -> Neq
 
+let lambop_of_uop (u : Ast.uop) : Lambdaast.uop =
+  match u with
+  | Not -> Not
+  | Neg -> Neg
+  | Deref -> failwith "Deref cannot be converted directly"
+
 (** [convert e] is a lambda calculus translation of an expression e*)
 let rec convert (e : expr) : lamcom = 
   let rec convert_var (e : expr) (s : Ast.var list) : lamcom = 
@@ -57,7 +63,11 @@ let rec convert (e : expr) : lamcom =
         | _ -> Bop (lambop_of_bop b, convert_var e1 s, convert_var e2 s)
       end
     | Fun(v,e') -> List.fold_right (fun elt acc -> Lam acc) v (convert_var e' ((List.rev v) @ s))
-    | Uop(u,e') -> failwith "unimplemented in alpha"
+    | Uop(u,e') -> begin
+        match u with
+        | Deref -> failwith "Unimplemented in gamma"
+        | _ -> Uop (lambop_of_uop u, convert_var e' s)
+      end
     (* Everything below here is unimplemented for alpha *)
     | Letg(v,e') -> failwith "unimplemented in beta"
     | Tuple(e1,e2) -> failwith "unimplemented in beta"

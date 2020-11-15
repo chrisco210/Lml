@@ -26,6 +26,7 @@ let rec sub (e1 : lamcom) (e2 : lamcom) (m : var) =
   | Bool b -> Bool b
   | If (b, etrue, efalse) -> If ((sub b e2 m), (sub etrue e2 m), (sub efalse e2 m))
   | Bop (op, l, r) -> Bop (op, sub l e2 m, sub r e2 m)
+  | Uop (op, e) -> Uop (op, sub e e2 m)
 
 
 let is_val (exp : lamcom) : bool =
@@ -61,7 +62,7 @@ let rec eval (exp : lamcom) : lamcom =
     let r' = 
       match eval r with 
       | Int n -> n 
-      | _ -> failwith ("Binary operators must take integers on rhs" ^ string_of_exp (Bop (op, l, r)))
+      | _ -> failwith ("Binary operators must take integers on rhs: " ^ string_of_exp (Bop (op, l, r)))
     in 
     begin
       match op with 
@@ -75,3 +76,17 @@ let rec eval (exp : lamcom) : lamcom =
       | Gt -> Bool (l' > r')
       | Neq -> Bool (l' <> r')
     end 
+  | Uop (op, e) ->
+    begin 
+      match op with
+      | Not -> begin
+          match eval e with
+          | Bool b -> Bool (Bool.not b)
+          | _ -> failwith ("Not must take a boolean: " ^ string_of_exp (Uop (op, e)))
+        end
+      | Neg -> begin
+          match eval e with
+          | Int n -> Int (-n)
+          | _ -> failwith ("Neg must take an integer: " ^ string_of_exp (Uop (op, e)))
+        end
+    end

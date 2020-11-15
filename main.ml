@@ -7,12 +7,12 @@ open Interp
 
 
 let eval_and_print (e:expr) : unit = let e' = convert e in 
-  print_endline ("Converts to: " ^ (string_of_exp e'));
-  print_endline ("Evaluates to: " ^ (e' |> eval |> string_of_exp))
+  print_endline ("-> " ^ (string_of_exp e'));
+  print_endline ("-> " ^ (e' |> eval |> string_of_exp))
 
 let rec main () = 
   print_endline "--------------------------------------------------------------------------------";
-  print_string ">";
+  print_string ">  ";
   (* Exception handling based on https://ocaml.org/learn/tutorials/error_handling.html  *)
   let input = read_line () in
   begin

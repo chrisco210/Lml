@@ -12,6 +12,11 @@ type bop =
   | Gt
   | Neq
 
+type uop =
+  | Not
+  | Neg
+  | Deref
+
 type var = int
 
 type lamcom = 
@@ -21,4 +26,5 @@ type lamcom =
   | Int of int
   | Bool of bool
   | Bop of bop * lamcom * lamcom
+  | Uop of uop * lamcom
   | If of lamcom * lamcom * lamcom

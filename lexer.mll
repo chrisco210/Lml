@@ -27,6 +27,8 @@ rule read =
   | ")" { RPAREN }
   | "=" { EQUALS }
   | "!=" { NEQ }
+  | "not" { NOT }
+  | "~-" { NEG }
   | "L" { LAMBDA }
   | "." { PERIOD }
   | "let" { LET }

@@ -37,6 +37,9 @@ open Ast
 %token EQUALS
 %token NEQ
 
+%token NOT
+%token NEG
+
 /* (*Function things*) */
 %token FUN 
 %token ARROW
@@ -45,7 +48,7 @@ open Ast
 
 %token EOF
 
-%nonassoc PERIOD ELSE IN ARROW
+%nonassoc PERIOD ELSE IN ARROW NOT
 
 %left LTEQ
 %left GTEQ
@@ -78,6 +81,10 @@ open Ast
   | NEQ { Neq }
   | EQUALS { Equals }
   ;
+uop:
+  | NOT { Not }
+  | NEG { Neg }
+  ;
 prog: 
   | e = expr; EOF { e }
   ;
@@ -93,6 +100,7 @@ expr:
   | FUN a = fun_args ARROW e = expr {Fun (a, e)}
   | e1 = expr e2 = expr %prec APP {App (e1, e2)}
   | e1 = expr b = binop e2 = expr {Bop (e1, b, e2)}
+  | u = uop e = expr {Uop (u,e)}
   | LPAREN e=expr RPAREN {e}
   ;
 fun_args:
