@@ -1,0 +1,4 @@
+let x = 4 in
+let f = fun z -> z + 4 in
+let x = 10 in
+f 6

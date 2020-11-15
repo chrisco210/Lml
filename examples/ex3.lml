@@ -1,0 +1,2 @@
+let add = fun x y -> x + y in
+add 1 2

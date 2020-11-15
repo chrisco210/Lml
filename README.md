@@ -14,13 +14,25 @@ lexers, so you will need to install both.
 Type `make` to build and run the program, which by default launches a repl
 interface.
 
+Type `make build` to build the binary without launching.  It outputs to 
+`main.byte`.
+
 Type `make test` to run tests.
+
+## Usage
+
+Running `lml [inputfile]` will parse the program in the input file and output
+the resulting lambda calculus and the result.
+
+Running just `lml` will start a simple REPL interpreter to use interactively.
+Right now it is pretty simple, but we will work on improving it in the future
+sprints.
 
 ## Sample Programs
 
 Here are some sample programs to run:
 
-Factorial function using the Y combinator:
+Factorial function using the Y combinator and lambda calculus notation:
 ```
 let Y = L f . (L x . f (x x)) (L x . f (x x)) in
 let G = L f . L n . if n = 0 then 1 else n * (f (n - 1)) in
@@ -58,19 +70,15 @@ Functions are values, and will halt evaluation:
 let x = fun a -> a in
 x
 ```
-
 Will evaluate to `L . $0`, which is the identity function in De Bruijn notation.
 
-## Usage
-`lml [inputfile]`
-
-Running the program with no arguments will launch a repl interface which will
-evaluate expressions you type. Options is one of the following:
+You can also write explicit recursive functions.  The same factorial function
+as above can be written as:
 ```
---output <file>             Places the resulting LC into <file>
---noexec                    Compiles LC without executing it
+let rec fact = fun n -> if n = 0 then 1 else n * fact (n - 1) in
+fact 4
 ```
-
+Evaluates to 24 again
 ## The ML language
 
 The ML language is defined with the following grammar:
