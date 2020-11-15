@@ -85,6 +85,7 @@ The ML language is defined with the following grammar:
 
 ```
 bop ::= + | - | * | < | > | <= | >= | = | != | ::
+uop ::= ~ | ~- | !
 
 e ::= (e)
       | let x = e1 in e2
@@ -104,6 +105,7 @@ e ::= (e)
       | (e1, e2, ... en)
       | e#n
       | e1 bop e2
+      | uop e
       | n
       | true
       | false
@@ -111,7 +113,8 @@ e ::= (e)
 
 These generally do what you would expect them to do.  The `::` operator is a 
 cons operator to append to a list, `e#n` extracts the `n`th item from a tuple
-`e`
+`e`. For unary operators,  `~` is logical negation, while `~-` is integer 
+negation, and `!` is dereferencing.
 
 ## Target Lambda calculus
 The target lambda calculus is De Bruijn lambda calculus extended with integers,
