@@ -26,6 +26,7 @@ let lambop_of_bop (b : Ast.bop) : Lambdaast.bop =
   | Gt -> Gt
   | Neq -> Neq
 
+(** [convert e] is a lambda calculus translation of an expression e*)
 let rec convert (e : expr) : lamcom = 
   let rec convert_var (e : expr) (s : Ast.var list) : lamcom = 
     match e with

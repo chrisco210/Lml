@@ -52,6 +52,7 @@ and uop =
   | Neg 
   | Deref
 
+(** [string_of_ast e] is a string representing the expression e*)
 let rec string_of_ast (e : expr) : string = 
   match e with 
   | Abs (v, e) -> "(L " ^ (v)  ^ " . " ^ (string_of_ast e) ^ ")"

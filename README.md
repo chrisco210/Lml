@@ -6,6 +6,15 @@ This takes an ML-style language with imperative features, and compiles it into
 lambda calculus extended with integers, the usual set of arithmetic and 
 comparison operators, and if statements.  
 
+## Install
+
+The interpreter uses the menhir parser and ocamllex to generate parsers and 
+lexers.  
+
+Type `make` to run a REPL interface 
+
+Type `make test` to run tests
+
 ## Usage
 `lml [inputfile]`
 

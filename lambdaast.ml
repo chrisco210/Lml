@@ -1,4 +1,5 @@
-(* The AST of De Bruijn lambda calculus extended with integers *)
+(* The AST of De Bruijn lambda calculus extended with integers operators and 
+   if statements *)
 
 type bop = 
   | Plus 

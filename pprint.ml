@@ -11,6 +11,8 @@ let string_of_bop (b : bop) : string = match b with
   | Gt -> ">"
   | Neq -> "!="
 
+(** [string_of_exp e] is a string representing the lambda calculus expression e
+*)
 let rec string_of_exp (e : lamcom) : string = 
   match e with 
   | App (e1, e2) -> "(" ^ (string_of_exp e1) ^ " " ^ (string_of_exp e2) ^ ")"
