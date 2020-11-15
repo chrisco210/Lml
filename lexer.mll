@@ -31,6 +31,8 @@ rule read =
   | "." { PERIOD }
   | "let" { LET }
   | "in" { IN }
+  | "fun" { FUN }
+  | "->" { ARROW }
   | id { ID (Lexing.lexeme lexbuf) }
   | int { INT (int_of_string (Lexing.lexeme lexbuf)) }
   | eof { EOF }

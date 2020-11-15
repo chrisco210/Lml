@@ -210,9 +210,11 @@ let parse_tests = [
   make_parse_test "let x = let y = (L x . x) 5 in y in x" (Ast.Let ("x", (Ast.Let ("y", (Ast.App (Ast.Abs ("x", Ast.Var "x"), Ast.Int 5)), Ast.Var "y")), Ast.Var "x"));
   make_parse_test "let x = let y = (L x . x) 5 in y y in x" (Ast.Let ("x", (Ast.Let ("y", (Ast.App (Ast.Abs ("x", Ast.Var "x"), Ast.Int 5)), Ast.App (Ast.Var "y", Ast.Var "y"))), Ast.Var "x"));
   make_parse_test "if a then b else c" (Ast.If (Ast.Var "a", Ast.Var "b", Ast.Var "c"));
-  (* make_parse_test "(L x . x) 5 < 3" (Bop (App (Abs ("x", Var "x"), Int 5), Lt, Int 3)); *)
+  make_parse_test "(L x . x) 5 < 3" (Bop (App (Abs ("x", Var "x"), Int 5), Lt, Int 3));
   make_parse_test "f 5 < 3" (Bop (App (Var "f", Int 5), Lt, Int 3));
-  (* make_parse_test "if (L x . x) 5 < 3 then L x . x else L y . y" (If ((Bop (App (Abs ("x", Var "x"), Int 5), Lt, Int 3)), (Abs ("x", Var "x")), (Abs ("y", Var "y")))); *)
+  make_parse_test "if (L x . x) 5 < 3 then L x . x else L y . y" (If ((Bop (App (Abs ("x", Var "x"), Int 5), Lt, Int 3)), (Abs ("x", Var "x")), (Abs ("y", Var "y"))));
+  make_parse_test "fun x -> x" (Fun (["x"], Var "x"));
+  make_parse_test "fun a b c d e f g -> 1" (Fun (["a"; "b"; "c"; "d"; "e"; "f"; "g"], Int 1));
 ]
 
 (* ------------------------ Conversion tests ----------------------------------- *)

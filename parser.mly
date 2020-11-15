@@ -60,14 +60,14 @@ open Ast
 %token NEG */
 
 /* (*Function things*) */
-/* %token FUN  */
-/* %token ARROW */
+%token FUN 
+%token ARROW
 %token LAMBDA
 %token APP
 
 %token EOF
 
-%nonassoc PERIOD ELSE IN
+%nonassoc PERIOD ELSE IN ARROW
 
 %left LTEQ
 %left GTEQ
@@ -82,8 +82,7 @@ open Ast
 /* Thanks to https://ptival.github.io/2017/05/16/parser-generators-and-function-application/
   for how to make function application left associative
  */
-/*  PERIOD THEN ELSE IN */
-%nonassoc LAMBDA IF LET LPAREN ID INT TRUE FALSE 
+%nonassoc LAMBDA IF LET LPAREN FUN ID INT TRUE FALSE 
 %nonassoc APP
 
 
@@ -112,7 +111,11 @@ expr:
   | LAMBDA v = ID PERIOD e = expr {Abs (v, e)}
   | LET v = ID EQUALS e1 = expr IN e2 = expr {Let (v, e1, e2)}
   | IF e1 = expr THEN e2 = expr ELSE e3 = expr {If (e1, e2, e3)}
+  | FUN a = fun_args ARROW e = expr {Fun (a, e)}
   | e1 = expr e2 = expr %prec APP {App (e1, e2)}
   | e1 = expr b = binop e2 = expr {Bop (e1, b, e2)}
   | LPAREN e=expr RPAREN {e}
   ;
+fun_args:
+  | v1 = ID { [v1] }
+  | h = ID t = fun_args { h::t }

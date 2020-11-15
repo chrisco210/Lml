@@ -62,7 +62,25 @@ let rec string_of_ast (e : expr) : string =
   | Bop (e1, bop, e2) -> "(" ^ (string_of_ast e1) ^ (string_of_bop bop) ^ (string_of_ast e2) ^ ")"
   | Let (v, e1, e2) -> "(let " ^ v ^ " = " ^ (string_of_ast e1) ^ " in " ^ (string_of_ast e2) ^ ")"
   | If (e1, e2, e3) -> "if (" ^ (string_of_ast e1) ^ ") then (" ^ (string_of_ast e2) ^ ") else (" ^ (string_of_ast e3) ^ ")"
-  | _ -> failwith "Unimplemented string_of_ast"
+  | Fun (v, e) -> "fun" ^ (List.fold_left (fun a b ->  a ^ " " ^ b) "" v) ^ " -> (" ^ (string_of_ast e) ^ ")"
+  | Tuple (e1, e2) -> "(" ^ (string_of_ast e1) ^ ", " ^ (string_of_ast e2) ^ ")"
+  | Proj (e, n) -> (string_of_ast e) ^ "#" ^ (string_of_int n)
+  | Seq (e1, e2) -> (string_of_ast e1) ^ "; " ^ (string_of_ast e2)
+  | Uop (uop, e) -> (string_of_uop uop) ^ (string_of_ast e)
+  | Ref (e) -> "ref " ^ (string_of_ast e)
+  | While (e1, e2) -> "while (" ^ (string_of_ast e1) ^ ") do (" ^ (string_of_ast e2) ^ ")"
+  | Assign (e1, e2) -> (string_of_ast e1) ^ " := " ^ (string_of_ast e2) 
+  | Break -> "break"
+  | Continue -> "continue"
+  | Hd e -> "hd " ^ (string_of_ast e)
+  | Tl e -> "tl " ^ (string_of_ast e)
+  | Nil -> "Nil"
+  | Letg (v, e) -> "let " ^ v ^ " = " ^ (string_of_ast e)
+and string_of_uop (o : uop) : string =
+  match o with
+  | Neg -> "~-"
+  | Not -> "not"
+  | Deref -> "!"
 and string_of_bop (b : bop) : string = 
   match b with
   | Plus -> "+"
