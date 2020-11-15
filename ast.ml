@@ -5,6 +5,7 @@ type var = string
 type expr = 
   (* Regular functional stuff *)
   | Let of var * expr * expr
+  | Letrec of var * (var list) * expr * expr
   | Letg of var * expr
   | If of expr * expr * expr
   | Tuple of expr * expr
@@ -61,6 +62,7 @@ let rec string_of_ast (e : expr) : string =
   | Int (i) -> string_of_int i
   | Bool (b) -> string_of_bool b
   | Bop (e1, bop, e2) -> "(" ^ (string_of_ast e1) ^ (string_of_bop bop) ^ (string_of_ast e2) ^ ")"
+  | Letrec (v, va, e, b) -> "let " ^ v ^ " = fun " ^ (List.fold_left (fun a b ->  a ^ " " ^ b) "" va) ^ "->" ^ (string_of_ast e) ^ " in " ^ (string_of_ast b)
   | Let (v, e1, e2) -> "(let " ^ v ^ " = " ^ (string_of_ast e1) ^ " in " ^ (string_of_ast e2) ^ ")"
   | If (e1, e2, e3) -> "if (" ^ (string_of_ast e1) ^ ") then (" ^ (string_of_ast e2) ^ ") else (" ^ (string_of_ast e3) ^ ")"
   | Fun (v, e) -> "fun" ^ (List.fold_left (fun a b ->  a ^ " " ^ b) "" v) ^ " -> (" ^ (string_of_ast e) ^ ")"

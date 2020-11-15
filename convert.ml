@@ -33,6 +33,16 @@ let rec convert (e : expr) : lamcom =
     | Abs(v,e') -> Lam (convert_var e' (v::s))
     | App(e1,e2) -> App (convert_var e1 s, convert_var e2 s)
     | Let(v,e1,e2) -> convert_var (App (Abs (v, e2), e1)) s
+    (* Uses the Y combinator for recursion *)
+    | Letrec (v, va, e, b) -> let ycomb = Lam (
+        App (
+          (Lam (App (Var 1, App (Var 0, Var 0)))), 
+          (Lam (App (Var 1, App (Var 0, Var 0))))
+        )
+      ) in 
+      let converted = convert_var (Abs (v, Fun (va, e))) s in 
+      let convbody = convert_var (Abs (v, b)) s in
+      App (convbody, App (ycomb, converted))
     | If(e1,e2,e3) -> If (convert_var e1 s, convert_var e2 s, convert_var e3 s)
     | Var(v) -> begin
         match list_posn s v with

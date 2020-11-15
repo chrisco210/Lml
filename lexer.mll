@@ -30,6 +30,7 @@ rule read =
   | "L" { LAMBDA }
   | "." { PERIOD }
   | "let" { LET }
+  | "let rec" { LETREC } 
   | "in" { IN }
   | "fun" { FUN }
   | "->" { ARROW }

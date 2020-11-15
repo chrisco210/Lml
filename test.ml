@@ -216,7 +216,9 @@ let parse_tests = [
   make_parse_test "fun x -> x" (Fun (["x"], Var "x"));
   make_parse_test "fun a b c d e f g -> 1" (Fun (["a"; "b"; "c"; "d"; "e"; "f"; "g"], Int 1));
   make_parse_test "fun x y -> x y" (Fun (["x"; "y"], (App (Var "x", Var "y"))));
-  make_parse_test "let f = fun x -> x + 1 in f 3 + 4" (Let ("f", (Fun (["x"], Bop (Var "x", Plus, Int 1))), Bop (App (Var "f", Int 3), Plus, Int 4)))
+  make_parse_test "let f = fun x -> x + 1 in f 3 + 4" (Let ("f", (Fun (["x"], Bop (Var "x", Plus, Int 1))), Bop (App (Var "f", Int 3), Plus, Int 4)));
+  make_parse_test "let rec f = fun a -> f a in 3" (Letrec ("f", ["a"], (App (Var "f", Var "a")), Int 3));
+  make_parse_test "let rec f = fun a b c d -> f a in 3" (Letrec ("f", ["a"; "b"; "c"; "d"], (App (Var "f", Var "a")), Int 3));
 ]
 
 (* ------------------------ Conversion tests ----------------------------------- *)
@@ -307,6 +309,10 @@ let exec_tests = [
   "Functions are values" >:: (fun _ ->
       "let x = fun a -> a in x" |> parse |> convert |> eval
       |> assert_equal (Lam (Var 0))
+    );
+  "Recursive definitions work" >:: (fun _ -> 
+      "let rec fact = fun n -> if n = 0 then 1 else n * fact (n - 1) in fact 4"
+      |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 24)
     )
 ]
 
