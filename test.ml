@@ -258,6 +258,19 @@ let convert_tests = [
       "(L x . x x) (L x . x x)" |> parse |> convert
       |> assert_equal (Lambdaast.App (partial, partial))
     );
+  "multi arg function" >:: (fun _ ->
+      "fun a b c -> 1" |> parse |> convert
+      |> assert_equal (Lam (Lam (Lam (Int 1))))
+    );
+  (* NOTE: Maybe we should make this kind of thing a syntax error *)
+  "multi arg function redefinition selects correctly" >:: (fun _ ->
+      "fun x y x -> x" |> parse |> convert
+      |> assert_equal (Lam (Lam (Lam (Var 0))))
+    );
+  "Multi arg function selects correct arguments" >:: (fun _ -> 
+      "fun a b c -> a b c" |> parse |> convert
+      |> assert_equal (Lam (Lam (Lam (App (App (Var 2, Var 1), Var 0)))))
+    )
 ]
 
 (* Conversion and execution tests *)
@@ -278,6 +291,10 @@ let exec_tests = [
       "let Y = " ^ ycombstr ^ " in let G = L f . L n . if n = 0 then 1 else n * (f (n - 1)) in Y G 4"
       |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 24)
     );
+  "Let expressions and functions" >:: (fun _ ->
+      "let f = fun x -> x + 1 in f (f (f (f (f 1))))" |> parse |> convert |> eval
+      |> assert_equal (Lambdaast.Int 6)
+    )
 ]
 
 let suite = "LML tests" >::: List.concat [lc_interpret_tests; parse_tests; convert_tests; exec_tests]

@@ -45,11 +45,11 @@ let rec convert (e : expr) : lamcom =
         | Cons -> failwith "Unimplemented in beta"
         | _ -> Bop (lambop_of_bop b, convert_var e1 s, convert_var e2 s)
       end
+    | Fun(v,e') -> List.fold_right (fun elt acc -> Lam acc) v (convert_var e' ((List.rev v) @ s))
     | Uop(u,e') -> failwith "unimplemented in alpha"
     (* Everything below here is unimplemented for alpha *)
     | Letg(v,e') -> failwith "unimplemented in beta"
     | Tuple(e1,e2) -> failwith "unimplemented in beta"
-    | Fun(v,e') -> failwith "unimplemented in beta"
     | Proj(e',n) -> failwith "unimplemented in beta"
     | Seq(e1,e2) -> failwith "unimplemented in gamma"
     | Ref(e') -> failwith "unimplemented in gamma"
