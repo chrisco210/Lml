@@ -2,4 +2,7 @@ open Ast
 open Pprint
 open Parse
 
-let _ = "L x . 1 + 2 + x" |> parse  |> string_of_ast |> print_endline
+let () = read_line() |> parse  |> main
+
+let main (e:expr) = let e' = convert e in 
+    print_string (string_of_exp e')^" -> "^(strign_of_exp (eval e'))
