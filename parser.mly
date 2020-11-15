@@ -23,25 +23,6 @@ open Ast
 %token THEN
 %token ELSE
 
-/* (*WHile stuff*) */
-/* %token WHILE
-%token DO
-%token BREAK
-%token CONTINUE */
-
-/* (*References*) */
-/* %token ASSIGN
-%token REF 
-%token BANG */
-
-/* (*Sequencing*) */
-/* %token SEMICOLON */
-
-/* (*List operations*) */
-/* %token NIL
-%token CONS  */
-
-
 
 /* (*Operators*) */
 %token LTEQ
@@ -54,10 +35,6 @@ open Ast
 %token MINUS
 %token EQUALS
 %token NEQ
-
-/* (*Unary Operators*) */
-/* %token NOT
-%token NEG */
 
 /* (*Function things*) */
 %token FUN 

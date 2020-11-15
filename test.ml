@@ -215,6 +215,8 @@ let parse_tests = [
   make_parse_test "if (L x . x) 5 < 3 then L x . x else L y . y" (If ((Bop (App (Abs ("x", Var "x"), Int 5), Lt, Int 3)), (Abs ("x", Var "x")), (Abs ("y", Var "y"))));
   make_parse_test "fun x -> x" (Fun (["x"], Var "x"));
   make_parse_test "fun a b c d e f g -> 1" (Fun (["a"; "b"; "c"; "d"; "e"; "f"; "g"], Int 1));
+  make_parse_test "fun x y -> x y" (Fun (["x"; "y"], (App (Var "x", Var "y"))));
+  make_parse_test "let f = fun x -> x + 1 in f 3 + 4" (Let ("f", (Fun (["x"], Bop (Var "x", Plus, Int 1))), Bop (App (Var "f", Int 3), Plus, Int 4)))
 ]
 
 (* ------------------------ Conversion tests ----------------------------------- *)
@@ -258,6 +260,26 @@ let convert_tests = [
     );
 ]
 
-let suite = "LML tests" >::: List.concat [lc_interpret_tests; parse_tests; convert_tests]
+(* Conversion and execution tests *)
+(* These are more simple because we test the interpreter parsing and conversion 
+   seperately above. *)
+
+(* Y ≜ 𝜆 𝑓 . (𝜆𝑥. 𝑓 (𝑥 𝑥)) (𝜆𝑥. 𝑓 (𝑥 𝑥)). *)
+(* 𝐺 ≜ 𝜆 𝑓 . 𝜆𝑛. if 𝑛 = 0 then 1 else 𝑛 × (𝑓 (𝑛 − 1)) *)
+
+let ycombstr = "L f . (L x . f (x x)) (L x . f (x x))"
+
+let exec_tests = [
+  "Simple application test" >:: (fun _ -> 
+      "(L x . x) 1" |> parse |> convert |> eval
+      |> assert_equal (Lambdaast.Int 1)
+    );
+  "Simple Y combinator test" >:: (fun _ ->
+      "let Y = " ^ ycombstr ^ " in let G = L f . L n . if n = 0 then 1 else n * (f (n - 1)) in Y G 4"
+      |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 24)
+    );
+]
+
+let suite = "LML tests" >::: List.concat [lc_interpret_tests; parse_tests; convert_tests; exec_tests]
 
 let _ = run_test_tt_main suite
