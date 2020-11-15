@@ -270,7 +270,8 @@ let convert_tests = [
   "Multi arg function selects correct arguments" >:: (fun _ -> 
       "fun a b c -> a b c" |> parse |> convert
       |> assert_equal (Lam (Lam (Lam (App (App (Var 2, Var 1), Var 0)))))
-    )
+    );
+
 ]
 
 (* Conversion and execution tests *)
@@ -294,6 +295,18 @@ let exec_tests = [
   "Let expressions and functions" >:: (fun _ ->
       "let f = fun x -> x + 1 in f (f (f (f (f 1))))" |> parse |> convert |> eval
       |> assert_equal (Lambdaast.Int 6)
+    );
+  "Functions define as expected" >:: (fun _ -> 
+      "let x = 4 in let f = fun z -> z + 4 in let x = 7 in f 6" 
+      |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 10)
+    );
+  "Partial application" >:: (fun _ ->
+      "let add = fun x y -> x + y in let addtwo = add 2 in addtwo 2"
+      |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 4)
+    );
+  "Functions are values" >:: (fun _ ->
+      "let x = fun a -> a in x" |> parse |> convert |> eval
+      |> assert_equal (Lam (Var 0))
     )
 ]
 
