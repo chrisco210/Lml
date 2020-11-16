@@ -1,0 +1,28 @@
+
+** Conflict (shift/reduce) in state 27.
+** Tokens involved: TRUE TIMES PLUS NOT NEQ NEG MINUS LTEQ LT LPAREN LETREC LET LAMBDA INT IF ID GTEQ GT FUN FALSE EQUALS
+** The following explanations concentrate on token TRUE.
+** This state is reached from prog after reading:
+
+uop expr 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+prog 
+expr EOF 
+(?)
+
+** In state 27, looking ahead at TRUE, shifting is permitted
+** because of the following sub-derivation:
+
+uop expr 
+    expr expr 
+         . TRUE 
+
+** In state 27, looking ahead at TRUE, reducing production
+** expr -> uop expr 
+** is permitted because of the following sub-derivation:
+
+expr expr // lookahead token appears because expr can begin with TRUE
+uop expr . 
