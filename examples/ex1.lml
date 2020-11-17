@@ -1,3 +1,4 @@
+(* Example of a combinator and using LC in LML. Should output 24 *)
 let Y = L f . (L x . f (x x)) (L x . f (x x)) in
 let G = L f . L n . if n = 0 then 1 else n * (f (n - 1)) in
 let factorial = Y G in

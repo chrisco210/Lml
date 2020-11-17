@@ -1,3 +1,4 @@
+(*Functions keep their environments.  Evaluates to 10*)
 let x = 4 in
 let f = fun z -> z + 4 in
 let x = 10 in

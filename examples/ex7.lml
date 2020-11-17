@@ -1,0 +1,12 @@
+(* An example of a more complex recursive program.  Should output 5 *)
+let rec mod = fun a b -> 
+  if a < b then a else
+    mod (a - b) b
+in
+let rec gcd = fun a b ->
+  if a = 0 then b else
+  if b = 0 then a else
+    let r = mod a b in
+    gcd b r 
+in
+gcd 55 10

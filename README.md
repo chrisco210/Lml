@@ -79,6 +79,8 @@ let rec fact = fun n -> if n = 0 then 1 else n * fact (n - 1) in
 fact 4
 ```
 Evaluates to 24 again
+
+More examples are available in the examples folder
 ## The ML language
 
 The ML language is defined with the following grammar:
@@ -116,6 +118,8 @@ cons operator to append to a list, `e#n` extracts the `n`th item from a tuple
 `e`. For unary operators,  `~` is logical negation, while `~-` is integer 
 negation, and `!` is dereferencing.
 
+You can do OCaml style comments using the `(* comment *)` syntax.
+
 ## Target Lambda calculus
 The target lambda calculus is De Bruijn lambda calculus extended with integers,
 booleans, operators, and if statements:
@@ -124,10 +128,12 @@ booleans, operators, and if statements:
 e ::= x
       | n
       | b
-      | i <-- This is a De Bruijn variable number
+      | $i <-- This is a De Bruijn variable number
       | if e1 then e2 else e3
       | L . e
       | e1 e2
+      | e1 bop e2
+      | uop e
 ```
 
 The lambda calculus is evaluated using big step call by name (lazy) evaluation.

@@ -47,6 +47,8 @@ and  bop =
   | Gteq
   | Gt
   | Neq
+  | And
+  | Or
   | Cons
 and uop =
   | Not
@@ -96,3 +98,5 @@ and string_of_bop (b : bop) : string =
   | Gt -> ">"
   | Neq -> "!="
   | Cons -> "::"
+  | And -> "&&"
+  | Or -> "||"

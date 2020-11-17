@@ -27,6 +27,8 @@ rule read =
   | ")" { RPAREN }
   | "=" { EQUALS }
   | "!=" { NEQ }
+  | "&&" { AND }
+  | "||" { OR }
   | "~" { NOT }
   | "~-" { NEG }
   | "L" { LAMBDA }
@@ -36,6 +38,14 @@ rule read =
   | "in" { IN }
   | "fun" { FUN }
   | "->" { ARROW }
+  | "(*" { comment 0 lexbuf } 
   | id { ID (Lexing.lexeme lexbuf) }
   | int { INT (int_of_string (Lexing.lexeme lexbuf)) }
   | eof { EOF }
+(*Comments are based on the 3110 A5 RML lexer*)
+and comment depth = parse
+  | "(*" { comment (depth + 1) lexbuf }
+  | "*)" { if depth = 0 then read lexbuf else comment (depth - 1) lexbuf }
+  | '\n' { Lexing.new_line lexbuf; comment depth lexbuf }
+  | eof  { EOF }
+  | _    { comment depth lexbuf }

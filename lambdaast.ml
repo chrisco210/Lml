@@ -11,7 +11,6 @@ type bop =
   | Gteq
   | Gt
   | Neq
-
 type uop =
   | Not
   | Neg

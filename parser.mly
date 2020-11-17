@@ -26,6 +26,9 @@ open Ast
 
 
 /* (*Operators*) */
+%token AND
+%token OR
+
 %token LTEQ
 %token GTEQ
 %token LT
@@ -50,7 +53,8 @@ open Ast
 
 %nonassoc PERIOD ELSE IN ARROW 
 
-
+%left AND
+%left OR
 %left LTEQ
 %left GTEQ
 %left GT
@@ -82,6 +86,8 @@ open Ast
   | TIMES { Times }
   | NEQ { Neq }
   | EQUALS { Equals }
+  | AND { And }
+  | OR { Or }
   ;
 %inline uop:
   | NOT { Not }

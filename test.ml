@@ -219,6 +219,10 @@ let parse_tests = [
   make_parse_test "let f = fun x -> x + 1 in f 3 + 4" (Let ("f", (Fun (["x"], Bop (Var "x", Plus, Int 1))), Bop (App (Var "f", Int 3), Plus, Int 4)));
   make_parse_test "let rec f = fun a -> f a in 3" (Letrec ("f", ["a"], (App (Var "f", Var "a")), Int 3));
   make_parse_test "let rec f = fun a b c d -> f a in 3" (Letrec ("f", ["a"; "b"; "c"; "d"], (App (Var "f", Var "a")), Int 3));
+  make_parse_test "(* comment *) L x . x" (Abs ("x", Var "x"));
+  make_parse_test "(* comment *) L x . (*more comments *)x" (Abs ("x", Var "x"));
+  make_parse_test "(* cool (*nested (*Comments*)*) *) L x . (*more comments *)x" (Abs ("x", Var "x")); 
+
 ]
 
 (* ------------------------ Conversion tests ----------------------------------- *)
@@ -273,7 +277,14 @@ let convert_tests = [
       "fun a b c -> a b c" |> parse |> convert
       |> assert_equal (Lam (Lam (Lam (App (App (Var 2, Var 1), Var 0)))))
     );
-
+  "Or is converted correctly" >:: (fun _ -> 
+      "L x . L y . x || y" |> parse |> convert 
+      |> assert_equal (Lam (Lam (Lambdaast.If (Var 1, Bool true, Var 0))))
+    );
+  "And is converted correctly" >:: (fun _ -> 
+      "L x . L y . x && y" |> parse |> convert 
+      |> assert_equal (Lam (Lam (Lambdaast.If (Var 1, Var 0, Bool false))))
+    );
 ]
 
 (* Conversion and execution tests *)
@@ -313,7 +324,22 @@ let exec_tests = [
   "Recursive definitions work" >:: (fun _ -> 
       "let rec fact = fun n -> if n = 0 then 1 else n * fact (n - 1) in fact 4"
       |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 24)
-    )
+    );
+  "Complex recursive function" >:: (fun _ -> 
+      "
+      let rec mod = fun a b -> 
+        if a < b then a else
+          mod (a - b) b
+        in
+      let rec gcd = fun a b ->
+        if a = 0 then b else
+        if b = 0 then a else
+          let r = mod a b in
+          gcd b r 
+        in
+      gcd 55 10
+    " |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 5)
+    );
 ]
 
 let suite = "LML tests" >::: List.concat [lc_interpret_tests; parse_tests; convert_tests; exec_tests]

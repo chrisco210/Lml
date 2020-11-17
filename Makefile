@@ -19,7 +19,7 @@ test:
 	$(OCAMLBUILD) -tag 'debug' $(TEST) && ./$(TEST) -runner sequential
 
 zip:
-	zip LML-$(GIT_HASH).zip *.ml* _tags Makefile  *.txt *.md
+	zip LML-$(GIT_HASH).zip *.ml* _tags Makefile  *.txt *.md examples/*.lml
 
 clean:
 	ocamlbuild -clean

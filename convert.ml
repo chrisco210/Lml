@@ -15,7 +15,7 @@ let list_posn (lst : 'a list) (item : 'a) : int option =
 (** [lambop_of_bop b] is the lambdaast version of a binary operator*)
 let lambop_of_bop (b : Ast.bop) : Lambdaast.bop = 
   match b with 
-  | Cons -> failwith "Cons cannot be converted directly"
+  | Cons | And | Or -> failwith "Cannot be converted directly"
   | Plus -> Plus
   | Minus -> Minus
   | Times -> Times
@@ -60,6 +60,8 @@ let rec convert (e : expr) : lamcom =
     | Bop(e1,b,e2) -> begin
         match b with
         | Cons -> failwith "Unimplemented in beta"
+        | And -> If (convert_var e1 s, convert_var e2 s, Bool false)
+        | Or -> If (convert_var e1 s, Bool true, convert_var e2 s)
         | _ -> Bop (lambop_of_bop b, convert_var e1 s, convert_var e2 s)
       end
     | Fun(v,e') -> List.fold_right (fun elt acc -> Lam acc) v (convert_var e' ((List.rev v) @ s))

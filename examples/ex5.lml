@@ -1,2 +1,3 @@
+(*Functions are values and can be an output.  Evaluates to L . $0*)
 let x = fun a -> a in
 x
