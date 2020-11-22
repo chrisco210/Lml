@@ -226,6 +226,8 @@ let parse_tests = [
   make_parse_test "(a, b)" (Tuple (Var "a", Var "b"));
   make_parse_test "(fun a -> a, fun b -> b)" (Tuple (Fun (["a"], Var "a"), Fun (["b"], Var "b")));
   make_parse_test "let a = (1, 2) in add a" (Let ("a", Tuple (Int 1, Int 2), App (Var "add", Var "a")));
+  make_parse_test "a b#0" (App (Var "a", Proj (Var "b", 0)));
+  make_parse_test "let x = (1, 2) in x # 0" (Let ("x", (Tuple (Int 1, Int 2)), Proj (Var "x", 0)));
 ]
 
 (* ------------------------ Conversion tests ----------------------------------- *)
@@ -351,6 +353,20 @@ let exec_tests = [
         in
       gcd 55 10
     " |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 5)
+    );
+  "Projection works correctly" >:: (fun _ ->
+      "(1,2)#0" |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 1)
+    );
+  "Projection works correctly" >:: (fun _ ->
+      "(1,2)#1" |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 2)
+    );
+  "Projection and application are applied correctly" >:: (fun _ ->
+      "(fun x -> x + 1, fun x -> x + 2)#0 1" 
+      |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 2)
+    );
+  "Nested tuples are projected correctly" >:: (fun _ -> 
+      "(1, (2, 3))#1#1" 
+      |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 3)
     );
 ]
 

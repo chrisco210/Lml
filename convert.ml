@@ -79,7 +79,12 @@ let rec convert (e : expr) : lamcom =
        https://en.wikipedia.org/wiki/Church_encoding#Church_pairs *)
     | Tuple(e1,e2) -> 
       App (App (Church.pair,  (convert_var e1 s)), convert_var e2 s)
-    | Proj(e',n) -> failwith "unimplemented in beta"
+    | Proj(e',n) -> let rec proj_rec (en : lamcom) (n : int) =  
+                      match n with
+                      | 0 -> (Lambdaast.App (Church.fst, en))
+                      | 1 -> (Lambdaast.App (Church.snd, en))
+                      | _ -> failwith "n-ary tuples are not implemented"
+      in proj_rec (convert_var e' s) n
     | Seq(e1,e2) -> failwith "unimplemented in gamma"
     | Ref(e') -> failwith "unimplemented in gamma"
     | While(e1,e2) -> failwith "unimplemented in gamma"

@@ -14,6 +14,8 @@ open Ast
 %token PERIOD
 %token COMMA
 
+%token POUND
+
 /* Let expressions */
 %token LET
 %token IN
@@ -70,8 +72,10 @@ open Ast
   for how to make function application left associative
  */
 %nonassoc LAMBDA IF LET LETREC LPAREN FUN ID INT TRUE FALSE NOT NEG
+
 %nonassoc APP
 
+%nonassoc POUND
 
 %start <Ast.expr> prog
 
@@ -109,6 +113,7 @@ expr:
   | e1 = expr e2 = expr %prec APP {App (e1, e2)}
   | e1 = expr b = binop e2 = expr {Bop (e1, b, e2)}
   | u = uop e = expr {Uop (u,e)}
+  | e1 = expr POUND n = INT { Proj(e1, n) }
   | LPAREN e=expr RPAREN {e}
   | LPAREN e1 = expr COMMA e2 = expr RPAREN {Tuple (e1, e2)}
   ;

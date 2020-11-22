@@ -34,6 +34,7 @@ rule read =
   | "L" { LAMBDA }
   | "." { PERIOD }
   | "," { COMMA }
+  | "#" { POUND }
   | "let" { LET }
   | "let rec" { LETREC } 
   | "in" { IN }
