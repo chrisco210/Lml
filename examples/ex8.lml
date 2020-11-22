@@ -1,0 +1,11 @@
+(* An example of using tuples in a function *)
+let curry = 
+  fun f -> 
+  fun tpl -> f tpl#0 tpl#1
+in
+let add = fun a b -> a + b
+in 
+let addcur = curry add in
+addcur (1, 2)
+
+(* Should output 3 *)

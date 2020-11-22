@@ -228,6 +228,7 @@ let parse_tests = [
   make_parse_test "let a = (1, 2) in add a" (Let ("a", Tuple (Int 1, Int 2), App (Var "add", Var "a")));
   make_parse_test "a b#0" (App (Var "a", Proj (Var "b", 0)));
   make_parse_test "let x = (1, 2) in x # 0" (Let ("x", (Tuple (Int 1, Int 2)), Proj (Var "x", 0)));
+  make_parse_test "fun a -> fun b -> b" (Fun (["a"], (Fun (["b"], Var "b"))))
 ]
 
 (* ------------------------ Conversion tests ----------------------------------- *)
@@ -368,6 +369,17 @@ let exec_tests = [
       "(1, (2, 3))#1#1" 
       |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 3)
     );
+  "Curried function test" >:: (fun _ -> 
+      "let curry = 
+      fun f -> 
+      fun tpl -> f tpl#0 tpl#1
+      in
+      let add = fun a b -> a + b
+      in 
+      let addcur = curry add in
+      addcur (1, 2)
+      " |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 3)
+    )
 ]
 
 let suite = "LML tests" >::: List.concat [lc_interpret_tests; parse_tests; convert_tests; exec_tests]
