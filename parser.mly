@@ -12,7 +12,7 @@ open Ast
 %token RPAREN
 /* %token NUMSIGN */
 %token PERIOD
-/* %token COMMA */
+%token COMMA
 
 /* Let expressions */
 %token LET
@@ -110,6 +110,7 @@ expr:
   | e1 = expr b = binop e2 = expr {Bop (e1, b, e2)}
   | u = uop e = expr {Uop (u,e)}
   | LPAREN e=expr RPAREN {e}
+  | LPAREN e1 = expr COMMA e2 = expr RPAREN {Tuple (e1, e2)}
   ;
 fun_args:
   | v1 = ID { [v1] }

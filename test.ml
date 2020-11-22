@@ -1,6 +1,7 @@
 open OUnit2
 open Lambdaast
 open Interp
+open Church
 
 (* Just the identity function *)
 let id_fun = Lam (Var 0)
@@ -222,7 +223,9 @@ let parse_tests = [
   make_parse_test "(* comment *) L x . x" (Abs ("x", Var "x"));
   make_parse_test "(* comment *) L x . (*more comments *)x" (Abs ("x", Var "x"));
   make_parse_test "(* cool (*nested (*Comments*)*) *) L x . (*more comments *)x" (Abs ("x", Var "x")); 
-
+  make_parse_test "(a, b)" (Tuple (Var "a", Var "b"));
+  make_parse_test "(fun a -> a, fun b -> b)" (Tuple (Fun (["a"], Var "a"), Fun (["b"], Var "b")));
+  make_parse_test "let a = (1, 2) in add a" (Let ("a", Tuple (Int 1, Int 2), App (Var "add", Var "a")));
 ]
 
 (* ------------------------ Conversion tests ----------------------------------- *)
@@ -285,6 +288,15 @@ let convert_tests = [
       "L x . L y . x && y" |> parse |> convert 
       |> assert_equal (Lam (Lam (Lambdaast.If (Var 1, Var 0, Bool false))))
     );
+  "Pair creation is correctly implemented" >:: (fun _ -> 
+      "(1, 2)" |> parse |> convert 
+      |> assert_equal (Lambdaast.App (App (Church.pair, Int 1), Int 2))
+    );
+  "Pair creation is correctly implemented" >:: (fun _ -> 
+      "(L x . x, L y . y)" |> parse |> convert 
+      |> assert_equal (Lambdaast.App (App (Church.pair, Lam (Var 0)), Lam (Var 0)))
+    );
+
 ]
 
 (* Conversion and execution tests *)

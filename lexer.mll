@@ -33,6 +33,7 @@ rule read =
   | "~-" { NEG }
   | "L" { LAMBDA }
   | "." { PERIOD }
+  | "," { COMMA }
   | "let" { LET }
   | "let rec" { LETREC } 
   | "in" { IN }

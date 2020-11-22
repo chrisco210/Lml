@@ -64,7 +64,10 @@ let rec convert (e : expr) : lamcom =
         | Or -> If (convert_var e1 s, Bool true, convert_var e2 s)
         | _ -> Bop (lambop_of_bop b, convert_var e1 s, convert_var e2 s)
       end
-    | Fun(v,e') -> List.fold_right (fun elt acc -> Lam acc) v (convert_var e' ((List.rev v) @ s))
+    | Fun(v,e') -> List.fold_right 
+                     (fun elt acc -> Lam acc) 
+                     v 
+                     (convert_var e' ((List.rev v) @ s))
     | Uop(u,e') -> begin
         match u with
         | Deref -> failwith "Unimplemented in gamma"
@@ -72,7 +75,10 @@ let rec convert (e : expr) : lamcom =
       end
     (* Everything below here is unimplemented for alpha *)
     | Letg(v,e') -> failwith "unimplemented in beta"
-    | Tuple(e1,e2) -> failwith "unimplemented in beta"
+    (* Using the encoding from 
+       https://en.wikipedia.org/wiki/Church_encoding#Church_pairs *)
+    | Tuple(e1,e2) -> 
+      App (App (Church.pair,  (convert_var e1 s)), convert_var e2 s)
     | Proj(e',n) -> failwith "unimplemented in beta"
     | Seq(e1,e2) -> failwith "unimplemented in gamma"
     | Ref(e') -> failwith "unimplemented in gamma"
