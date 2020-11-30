@@ -40,6 +40,10 @@ rule read =
   | "in" { IN }
   | "fun" { FUN }
   | "->" { ARROW }
+  | "::" { CONS }
+  | "hd" { HD }
+  | "tl" { TL }
+  | "[]" { NIL }
   | "(*" { comment 0 lexbuf } 
   | id { ID (Lexing.lexeme lexbuf) }
   | int { INT (int_of_string (Lexing.lexeme lexbuf)) }

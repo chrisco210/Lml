@@ -13,6 +13,7 @@ open Ast
 /* %token NUMSIGN */
 %token PERIOD
 %token COMMA
+%token CONS
 
 %token POUND
 
@@ -44,6 +45,10 @@ open Ast
 
 %token NOT
 %token NEG
+%token HD
+%token TL
+
+%token NIL
 
 /* (*Function things*) */
 %token FUN 
@@ -92,10 +97,13 @@ open Ast
   | EQUALS { Equals }
   | AND { And }
   | OR { Or }
+  | CONS { Cons }
   ;
 %inline uop:
   | NOT { Not }
   | NEG { Neg }
+  | TL { Tl }
+  | HD { Hd }
   ;
 prog: 
   | e = expr; EOF { e }
@@ -105,6 +113,7 @@ expr:
   | x = ID { Var x }
   | b = TRUE { Bool true }
   | b = FALSE { Bool false }
+  | l = NIL { Nil }
   | LAMBDA v = ID PERIOD e = expr {Abs (v, e)}
   | LET v = ID EQUALS e1 = expr IN e2 = expr {Let (v, e1, e2)}
   | LETREC v = ID EQUALS FUN a = fun_args ARROW e = expr IN e1 = expr{Letrec (v, a, e, e1)} 

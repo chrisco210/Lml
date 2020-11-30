@@ -2,6 +2,7 @@
 
 open Ast
 open Lambdaast
+open Church
 
 let list_posn (lst : 'a list) (item : 'a) : int option = 
   let rec list_posni (lst : 'a list) (item : 'a) (n : int) : int option = 
@@ -59,7 +60,7 @@ let rec convert (e : expr) : lamcom =
     | Bool(b) -> Bool b
     | Bop(e1,b,e2) -> begin
         match b with
-        | Cons -> failwith "Unimplemented in beta"
+        | Cons -> App (App (Church.pair,  Bool false), App (App (Church.pair, convert_var e1 s), convert_var e2 s))
         | And -> If (convert_var e1 s, convert_var e2 s, Bool false)
         | Or -> If (convert_var e1 s, Bool true, convert_var e2 s)
         | _ -> Bop (lambop_of_bop b, convert_var e1 s, convert_var e2 s)
@@ -70,6 +71,16 @@ let rec convert (e : expr) : lamcom =
                      (convert_var e' ((List.rev v) @ s))
     | Uop(u,e') -> begin
         match u with
+        | Hd -> let x = convert_var e' s in begin match x with
+            | App (App (_,  Bool b), e2) when b = false -> App (Church.fst, e2)
+            | App (App (_,  Bool b), e2) -> x
+            | _ -> failwith "Mismatched type for hd operation"
+          end
+        | Tl -> let x = convert_var e' s in begin match x with
+            | App (App (_,  Bool b), e2) when b = false -> App (Church.snd, e2)
+            | App (App (_,  Bool b), e2) -> x
+            | _ -> failwith "Mismatched type for tl operation"
+          end
         | Deref -> failwith "Unimplemented in gamma"
         | _ -> Uop (lambop_of_uop u, convert_var e' s)
       end
@@ -91,7 +102,5 @@ let rec convert (e : expr) : lamcom =
     | Assign(e1,e2) -> failwith "unimplemented in gamma"
     | Break -> failwith "unimplemented in gamma"
     | Continue -> failwith "unimplemented in gamma"
-    | Hd(l) -> failwith "unimplemented in beta"
-    | Tl(l) -> failwith "unimplemented in beta"
-    | Nil -> failwith "unimplemented in beta"
+    | Nil -> App (App (Church.pair,  Bool true), Bool true)
   in convert_var e []

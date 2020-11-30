@@ -28,9 +28,6 @@ type expr =
   | Abs of var * expr
   | App of expr * expr
 
-  (* List operations *)
-  | Hd of expr
-  | Tl of expr
   | Nil
 
   (* Literals *)
@@ -53,6 +50,8 @@ and  bop =
 and uop =
   | Not
   | Neg 
+  | Hd 
+  | Tl 
   | Deref
 
 (** [string_of_ast e] is a string representing the expression e*)
@@ -77,14 +76,14 @@ let rec string_of_ast (e : expr) : string =
   | Assign (e1, e2) -> (string_of_ast e1) ^ " := " ^ (string_of_ast e2) 
   | Break -> "break"
   | Continue -> "continue"
-  | Hd e -> "hd " ^ (string_of_ast e)
-  | Tl e -> "tl " ^ (string_of_ast e)
-  | Nil -> "Nil"
+  | Nil -> "[]"
   | Letg (v, e) -> "let " ^ v ^ " = " ^ (string_of_ast e)
 and string_of_uop (o : uop) : string =
   match o with
   | Neg -> "~-"
   | Not -> "~"
+  | Hd -> "hd"
+  | Tl -> "tl"
   | Deref -> "!"
 and string_of_bop (b : bop) : string = 
   match b with
