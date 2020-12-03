@@ -18,7 +18,7 @@ let rec shift (i : var) (c : int) (e : lamcom) : lamcom =
   | If (b, etrue, efalse) -> If (shift i c b, shift i c etrue, shift i c efalse)
 
 (** [sub e1 e2 n] substitutes [e2] for [n] in [e1]*)
-let rec sub (e1 : lamcom) (e2 : lamcom) (m : var) = 
+let rec sub (e1 : lamcom) (e2 : lamcom) (m : var) : lamcom = 
   match e1 with 
   | App (el, er) -> App ((sub el e2 m), (sub er e2 m))
   | Lam e -> Lam (sub e (shift 1 0 e2) (m + 1))

@@ -4,12 +4,12 @@ open Interp
 open Church
 
 (* Just the identity function *)
-let id_fun = Lam (Var 0)
+let id_fun : lamcom = Lam (Var 0)
 
 (* Y ≜ 𝜆 𝑓 . (𝜆𝑥. 𝑓 (𝑥 𝑥)) (𝜆𝑥. 𝑓 (𝑥 𝑥)). *)
 (* 𝐺 ≜ 𝜆 𝑓 . 𝜆𝑛. if 𝑛 = 0 then 1 else 𝑛 × (𝑓 (𝑛 − 1)) *)
 (* We use the Y combinator because we implemented call by name semantics *)
-let ycomb = Lam (
+let ycomb : lamcom = Lam (
     App (
       (Lam (App (Var 1, App (Var 0, Var 0)))), 
       (Lam (App (Var 1, App (Var 0, Var 0))))
@@ -17,7 +17,7 @@ let ycomb = Lam (
   )
 
 (* The fixed point of this function is the factorial function *)
-let fact' = Lam (
+let fact' : lamcom  = Lam (
     Lam (
       If (
         (Bop (Equals, (Var 0), (Int 0))),
@@ -38,10 +38,10 @@ let fact' = Lam (
     )
   )
 
-let fact = App (ycomb, fact')
+let fact : lamcom = App (ycomb, fact')
 
 (* The fixed point of this raises a base to an exponent  *)
-let pow' = 
+let pow' : lamcom = 
   Lam (
     Lam (
       Lam (
@@ -73,22 +73,22 @@ let pow' =
     )
   )
 
-let pow = App (ycomb, pow')
+let pow : lamcom = App (ycomb, pow')
 
 (* Nested function *)
-let nested = App (Lam (Lam (Var 1)), Int 4)
-let deepnested = Lam (Lam (Lam (Lam (Var 2))))
+let nested : lamcom = App (Lam (Lam (Var 1)), Int 4)
+let deepnested : lamcom = Lam (Lam (Lam (Lam (Var 2))))
 
 (* Simple first class function application and evaluation *)
-let firstclasssimple = App (Lam (Lam (App (Var 1, (App (Var 1, Var 0))))), Lam (Bop (Times, Int 2, Var 0)))
+let firstclasssimple : lamcom = App (Lam (Lam (App (Var 1, (App (Var 1, Var 0))))), Lam (Bop (Times, Int 2, Var 0)))
 
 
 (* Standard boolean encodings  *)
-let enc_true = Lam (Lam (Var 1))
-let enc_false = Lam (Lam (Var 0))
-let enc_not = Lam (App (App (Var 0, enc_false), enc_true))
-let enc_and = Lam (Lam (App (App (Var 1, Var 0), enc_false)))
-let enc_or = Lam (Lam (App (App (Var 1, enc_true), Var 0)))
+let enc_true : lamcom = Lam (Lam (Var 1))
+let enc_false : lamcom = Lam (Lam (Var 0))
+let enc_not : lamcom = Lam (App (App (Var 0, enc_false), enc_true))
+let enc_and : lamcom = Lam (Lam (App (App (Var 1, Var 0), enc_false)))
+let enc_or : lamcom = Lam (Lam (App (App (Var 1, enc_true), Var 0)))
 
 (* Generates a church numeral for n *)
 let church (n : int): lamcom = 
@@ -291,14 +291,6 @@ let convert_tests = [
       "L x . L y . x && y" |> parse |> convert 
       |> assert_equal (Lam (Lam (Lambdaast.If (Var 1, Var 0, Bool false))))
     );
-  "Pair creation is correctly implemented" >:: (fun _ -> 
-      "(1, 2)" |> parse |> convert 
-      |> assert_equal (Lambdaast.App (App (Church.pair, Int 1), Int 2))
-    );
-  "Pair creation is correctly implemented" >:: (fun _ -> 
-      "(L x . x, L y . y)" |> parse |> convert 
-      |> assert_equal (Lambdaast.App (App (Church.pair, Lam (Var 0)), Lam (Var 0)))
-    );
 
 ]
 
@@ -382,6 +374,11 @@ let exec_tests = [
     )
 ]
 
-let suite = "LML tests" >::: List.concat [lc_interpret_tests; parse_tests; convert_tests; exec_tests]
+let suite = "LML tests" >::: List.concat [
+    lc_interpret_tests; 
+    parse_tests; 
+    (* convert_tests; *)
+    exec_tests
+  ]
 
 let _ = run_test_tt_main suite
