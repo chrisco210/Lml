@@ -71,11 +71,12 @@ open Ast
 %left PLUS
 %left MINUS
 %left TIMES
-%right CONS
+
+
 /* Thanks to https://ptival.github.io/2017/05/16/parser-generators-and-function-application/
   for how to make function application left associative
  */
-%nonassoc LAMBDA IF LET LETREC LPAREN FUN ID INT TRUE FALSE NOT NEG HD TL NIL
+%nonassoc LAMBDA IF LET LETREC LPAREN FUN ID INT TRUE FALSE NOT NEG
 
 %nonassoc APP
 
