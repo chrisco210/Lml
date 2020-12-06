@@ -44,6 +44,7 @@ rule read =
   | "hd" { HD }
   | "tl" { TL }
   | "[]" { NIL }
+  | ";" {SEMICOLON}
   | "(*" { comment 0 lexbuf } 
   | id { ID (Lexing.lexeme lexbuf) }
   | int { INT (int_of_string (Lexing.lexeme lexbuf)) }

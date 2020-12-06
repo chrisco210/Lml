@@ -63,9 +63,49 @@ let rec convert_cps_init (e : iast) : iast =
                )
          )
         )
-  | Uop (u, e') -> failwith "Unimplemented convert_cps_init"
-  | If (g, e1, e2) -> failwith "Unimplemented convert_cps_init"
-  | Seq (e1, e2) -> failwith "Unimplemented convert_cps_init"
+  | Uop (u, e') -> 
+    let k = free_var () in
+    let n = free_var () in 
+    Lam (k,
+         App (
+           convert_cps_init e',
+           Lam (n, 
+                App (
+                  Var k,
+                  Uop (u, Var n)
+                )
+               )
+         )
+        )
+  | If (b, e1, e2) -> 
+    let k = free_var () in 
+    let g = free_var () in 
+    Lam (k, 
+         App (
+           convert_cps_init b,
+           Lam (g,
+                If(
+                  Var g,
+                  App (convert_cps_init e1, Var k),
+                  App (convert_cps_init e2, Var k) 
+                )
+               )
+         )
+        )
+  | Seq (e1, e2) -> 
+    let k = free_var () in 
+    let f = free_var () in 
+    Lam (k,
+         App (
+           convert_cps_init e1,
+           Lam (f,
+                App (
+                  convert_cps_init e2,
+                  Var k
+                )
+               )
+         )
+        )
   | Ref (e) -> failwith "Unimplemented convert_cps_init"
   | While (e1, e2) -> failwith "Unimplemented convert_cps_init"
   | Assign (e1, e2) -> failwith "Unimplemented convert_cps_init"
@@ -81,6 +121,7 @@ let rec convert_cps_init (e : iast) : iast =
     let k = free_var () in 
     Lam (k, App (Var k, Bool b))
 
+(** [convert_cps_vars s e] converts an intermediate ast into a de bruijn AST*)
 let rec convert_cps_vars (s : ivar list) (e : iast) : lamcom = 
   let list_posn (lst : 'a list) (item : 'a) : int option = 
     let rec list_posni (lst : 'a list) (item : 'a) (n : int) : int option = 

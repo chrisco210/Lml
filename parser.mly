@@ -15,6 +15,8 @@ open Ast
 %token COMMA
 %token CONS
 
+%token SEMICOLON
+
 %token POUND
 
 /* Let expressions */
@@ -72,6 +74,7 @@ open Ast
 %left MINUS
 %left TIMES
 %right CONS
+%left SEMICOLON
 /* Thanks to https://ptival.github.io/2017/05/16/parser-generators-and-function-application/
   for how to make function application left associative
  */
@@ -113,6 +116,7 @@ expr:
   | b = TRUE { Bool true }
   | b = FALSE { Bool false }
   | l = NIL { Nil }
+  | e1 = expr SEMICOLON e2 = expr {Seq (e1, e2)}
   | LAMBDA v = ID PERIOD e = expr {Abs (v, e)}
   | LET v = ID EQUALS e1 = expr IN e2 = expr {Let (v, e1, e2)}
   | LETREC v = ID EQUALS FUN a = fun_args ARROW e = expr IN e1 = expr{Letrec (v, a, e, e1)} 
