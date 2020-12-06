@@ -35,7 +35,6 @@ let lambop_of_uop (u : Ast.uop) : Lambdaast.uop =
   match u with
   | Not -> Not
   | Neg -> Neg
-  | Deref -> failwith "Deref cannot be converted directly"
   | Hd -> failwith "Hd cannot be converted directly"
   | Tl -> failwith "Tl cannot be converted directly"
 
@@ -82,7 +81,6 @@ let rec convert_var (e : expr) : iast =
           | App (App (_,  Bool b), e2) -> x
           | _ -> failwith "Mismatched type for tl operation"
         end
-      | Deref -> failwith "Unimplemented in gamma"
       | _ -> Uop (lambop_of_uop u, convert_var e')
     end
   (* Everything below here is unimplemented for alpha *)
@@ -98,9 +96,10 @@ let rec convert_var (e : expr) : iast =
                     | _ -> failwith "n-ary tuples are not implemented"
     in proj_rec (convert_var e') n
   | Seq(e1,e2) -> Seq(convert_var e1, convert_var e2)
-  | Ref(e') -> failwith "unimplemented in gamma"
+  | Ref(e') -> Ref (convert_var e')
+  | Deref (e') -> Deref (convert_var e')
   | While(e1,e2) -> While (convert_var e1, convert_var e2)
-  | Assign(e1,e2) -> failwith "unimplemented in gamma"
+  | Assign(e1,e2) -> Assign (convert_var e1, convert_var e2)
   | Break -> Break
   | Continue -> Continue
   | Nil -> App (App (pair,  Bool true), Bool true)

@@ -14,7 +14,6 @@ let string_of_bop (b : bop) : string = match b with
 let string_of_uop (u : uop) : string = match u with
   | Not -> "~"
   | Neg -> "~-"
-  | Deref -> "!"
 
 (** [string_of_exp e] is a string representing the lambda calculus expression e
 *)

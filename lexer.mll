@@ -21,6 +21,9 @@ rule read =
   | "done" {DONE}
   | "continue" {CONTINUE}
   | "break" {BREAK}
+  | "!" {DEREF}
+  | "ref" {REF}
+  | ":=" {COLONEQUALS}
   | "<=" { LTEQ }
   | ">=" { GTEQ }
   | "<" { LT }

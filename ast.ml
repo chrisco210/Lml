@@ -21,6 +21,7 @@ type expr =
   | Ref of expr 
   | While of expr * expr
   | Assign of expr * expr
+  | Deref of expr
   | Break
   | Continue
 
@@ -53,7 +54,6 @@ and uop =
   | Neg 
   | Hd 
   | Tl 
-  | Deref
 
 (** [string_of_ast e] is a string representing the expression e*)
 let rec string_of_ast (e : expr) : string = 
@@ -73,6 +73,7 @@ let rec string_of_ast (e : expr) : string =
   | Seq (e1, e2) -> (string_of_ast e1) ^ "; " ^ (string_of_ast e2)
   | Uop (uop, e) -> (string_of_uop uop) ^ (string_of_ast e)
   | Ref (e) -> "ref " ^ (string_of_ast e)
+  | Deref e -> "!" ^ (string_of_ast e)
   | While (e1, e2) -> "while (" ^ (string_of_ast e1) ^ ") do (" ^ (string_of_ast e2) ^ ")"
   | Assign (e1, e2) -> (string_of_ast e1) ^ " := " ^ (string_of_ast e2) 
   | Break -> "break"
@@ -86,7 +87,6 @@ and string_of_uop (o : uop) : string =
   | Not -> "~"
   | Hd -> "hd"
   | Tl -> "tl"
-  | Deref -> "!"
 and string_of_bop (b : bop) : string = 
   match b with
   | Plus -> "+"

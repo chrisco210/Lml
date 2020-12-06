@@ -107,13 +107,16 @@ let rec convert_cps_init (e : iast) : iast =
          )
         )
   | Ref (e) -> failwith "Unimplemented convert_cps_init"
+  | Deref (e) -> failwith "Unimplemented convert_cps_init"
+  | Assign (e1, e2) -> failwith "Unimplemented convert_cps_init"
   | While (b, e') -> 
-    let zcomb = Lam ("**f", 
-                     App (
-                       (Lam ("**x", App (Var "**f", Lam ("**y", App (App (Var "**x", Var "**x"), Var "**y"))))), 
-                       (Lam ("**x", App (Var "**f", Lam ("**y", App (App (Var "**x", Var "**x"), Var "**y"))))) 
-                     )
-                    ) in 
+    let zcomb = 
+      Lam ("**f", 
+           App (
+             (Lam ("**x", App (Var "**f", Lam ("**y", App (App (Var "**x", Var "**x"), Var "**y"))))), 
+             (Lam ("**x", App (Var "**f", Lam ("**y", App (App (Var "**x", Var "**x"), Var "**y"))))) 
+           )
+          ) in 
     let k = free_var () in 
     let f = free_var () in 
     let g = free_var () in 
@@ -134,7 +137,6 @@ let rec convert_cps_init (e : iast) : iast =
                )
          )
         )
-  | Assign (e1, e2) -> failwith "Unimplemented convert_cps_init"
   | Break -> failwith "Unimplemented convert_cps_init"
   | Continue -> failwith "Unimplemented convert_cps_init"
   | Var v -> 
@@ -171,6 +173,7 @@ let rec convert_cps_vars (s : ivar list) (e : iast) : lamcom =
                           convert_cps_vars s e2)
   | Seq (e1, e2) -> failwith "Cannot directly convert a Seq"
   | Ref (e) -> failwith "Cannot directly convert a Ref"
+  | Deref (e) -> failwith "Cannot directly convert a deref"
   | While (e1, e2) -> failwith "Cannot directly convert a While"
   | Assign (e1, e2) -> failwith "Cannot directly convert a Assign"
   | Break -> failwith "Cannot directly convert a Break"

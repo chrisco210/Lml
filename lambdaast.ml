@@ -14,7 +14,6 @@ type bop =
 type uop =
   | Not
   | Neg
-  | Deref
 
 type var = int
 

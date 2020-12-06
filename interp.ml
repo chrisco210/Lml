@@ -93,5 +93,4 @@ let rec eval (exp : lamcom) : lamcom =
           | Int n -> Int (-n)
           | _ -> failwith ("Neg must take an integer: " ^ string_of_exp (Uop (op, e)))
         end
-      | Deref -> failwith "unimplemented in gamma"
     end

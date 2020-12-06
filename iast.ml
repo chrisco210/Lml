@@ -14,6 +14,7 @@ type iast =
   (* Imperative features that are not converted at this stage *)
   | Seq of iast * iast
   | Ref of iast 
+  | Deref of iast
   | While of iast * iast
   | Assign of iast * iast
   | Break

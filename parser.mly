@@ -59,6 +59,11 @@ open Ast
 
 %token NIL
 
+/* References */
+%token COLONEQUALS
+%token DEREF
+%token REF
+
 /* (*Function things*) */
 %token FUN 
 %token ARROW
@@ -67,7 +72,7 @@ open Ast
 
 %token EOF
 
-%nonassoc PERIOD ELSE IN ARROW
+%nonassoc PERIOD ELSE IN ARROW COLONEQUALS 
 
 %left SEMICOLON
 %left AND
@@ -85,7 +90,7 @@ open Ast
 /* Thanks to https://ptival.github.io/2017/05/16/parser-generators-and-function-application/
   for how to make function application left associative
  */
-%nonassoc LAMBDA IF WHILE LET LETREC LPAREN FUN ID INT TRUE FALSE NOT NEG HD TL NIL UNIT CONTINUE BREAK
+%nonassoc LAMBDA IF WHILE LET LETREC LPAREN FUN ID INT TRUE FALSE NOT NEG HD TL NIL UNIT CONTINUE BREAK REF DEREF
 
 %nonassoc APP
 
@@ -126,6 +131,11 @@ expr:
   | l = NIL { Nil }
   | BREAK {Break}
   | CONTINUE {Continue}
+
+  | REF e = expr {Ref e}
+  | DEREF e = expr {Deref e}
+  | e1 = expr COLONEQUALS e2 = expr {Assign(e1, e2)}
+
   | e1 = expr SEMICOLON e2 = expr {Seq (e1, e2)}
   | LAMBDA v = ID PERIOD e = expr {Abs (v, e)}
   | LET v = ID EQUALS e1 = expr IN e2 = expr {Let (v, e1, e2)}
