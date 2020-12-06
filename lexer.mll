@@ -19,6 +19,8 @@ rule read =
   | "while" {WHILE}
   | "do" {DO}
   | "done" {DONE}
+  | "continue" {CONTINUE}
+  | "break" {BREAK}
   | "<=" { LTEQ }
   | ">=" { GTEQ }
   | "<" { LT }

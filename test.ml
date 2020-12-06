@@ -301,6 +301,10 @@ let exec_tests = [
       "(1, (2, 3))#1#1" 
       |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 3)
     );
+  "More nested tuples" >:: (fun _ ->
+      "let a = ((1, 2),(3,4)) in a#0#0 + a#0#1 + a#1#0 + a#1#1"
+      |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 10)
+    );
   "Curried function test" >:: (fun _ -> 
       "let curry = 
       fun f -> 
@@ -313,7 +317,7 @@ let exec_tests = [
       " |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 3)
     );
   "List operations" >:: (fun _ -> 
-      "hd (1::2::3)" |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 1)
+      "hd (1::2::3::[])" |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 1)
     )
 ]
 

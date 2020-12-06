@@ -34,6 +34,9 @@ open Ast
 %token DO
 %token DONE
 
+%token BREAK
+%token CONTINUE
+
 /* (*Operators*) */
 %token AND
 %token OR
@@ -82,7 +85,7 @@ open Ast
 /* Thanks to https://ptival.github.io/2017/05/16/parser-generators-and-function-application/
   for how to make function application left associative
  */
-%nonassoc LAMBDA IF WHILE LET LETREC LPAREN FUN ID INT TRUE FALSE NOT NEG HD TL NIL UNIT
+%nonassoc LAMBDA IF WHILE LET LETREC LPAREN FUN ID INT TRUE FALSE NOT NEG HD TL NIL UNIT CONTINUE BREAK
 
 %nonassoc APP
 
@@ -121,6 +124,8 @@ expr:
   | b = FALSE { Bool false }
   | b = UNIT { Unit }
   | l = NIL { Nil }
+  | BREAK {Break}
+  | CONTINUE {Continue}
   | e1 = expr SEMICOLON e2 = expr {Seq (e1, e2)}
   | LAMBDA v = ID PERIOD e = expr {Abs (v, e)}
   | LET v = ID EQUALS e1 = expr IN e2 = expr {Let (v, e1, e2)}

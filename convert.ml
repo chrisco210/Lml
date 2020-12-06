@@ -101,11 +101,10 @@ let rec convert_var (e : expr) : iast =
   | Ref(e') -> failwith "unimplemented in gamma"
   | While(e1,e2) -> While (convert_var e1, convert_var e2)
   | Assign(e1,e2) -> failwith "unimplemented in gamma"
-  | Break -> failwith "unimplemented in gamma"
-  | Continue -> failwith "unimplemented in gamma"
+  | Break -> Break
+  | Continue -> Continue
   | Nil -> App (App (pair,  Bool true), Bool true)
   | Unit -> Unit
-
 
 let rec convert (e : expr) : lamcom = 
   let translated = convert_var e |> convert_cps in 
