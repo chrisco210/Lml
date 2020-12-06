@@ -34,6 +34,7 @@ type expr =
   | Var of var
   | Int of int
   | Bool of bool
+  | Unit
 and  bop = 
   | Plus 
   | Minus
@@ -78,6 +79,7 @@ let rec string_of_ast (e : expr) : string =
   | Continue -> "continue"
   | Nil -> "[]"
   | Letg (v, e) -> "let " ^ v ^ " = " ^ (string_of_ast e)
+  | Unit -> "unit"
 and string_of_uop (o : uop) : string =
   match o with
   | Neg -> "~-"

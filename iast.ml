@@ -6,6 +6,7 @@ type iast =
   | Lam of ivar * iast
   | Var of ivar
   | Int of int
+  | Unit
   | Bool of bool
   | Bop of Lambdaast.bop * iast * iast
   | Uop of Lambdaast.uop * iast

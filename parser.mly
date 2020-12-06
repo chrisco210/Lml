@@ -4,6 +4,7 @@ open Ast
  /* Immidiate values  */
 %token <int> INT
 %token <string> ID
+%token UNIT
 %token TRUE
 %token FALSE
 
@@ -29,6 +30,9 @@ open Ast
 %token THEN
 %token ELSE
 
+%token WHILE
+%token DO
+%token DONE
 
 /* (*Operators*) */
 %token AND
@@ -60,8 +64,9 @@ open Ast
 
 %token EOF
 
-%nonassoc PERIOD ELSE IN ARROW 
+%nonassoc PERIOD ELSE IN ARROW
 
+%left SEMICOLON
 %left AND
 %left OR
 %left LTEQ
@@ -74,11 +79,10 @@ open Ast
 %left MINUS
 %left TIMES
 %right CONS
-%left SEMICOLON
 /* Thanks to https://ptival.github.io/2017/05/16/parser-generators-and-function-application/
   for how to make function application left associative
  */
-%nonassoc LAMBDA IF LET LETREC LPAREN FUN ID INT TRUE FALSE NOT NEG HD TL NIL
+%nonassoc LAMBDA IF WHILE LET LETREC LPAREN FUN ID INT TRUE FALSE NOT NEG HD TL NIL UNIT
 
 %nonassoc APP
 
@@ -115,12 +119,14 @@ expr:
   | x = ID { Var x }
   | b = TRUE { Bool true }
   | b = FALSE { Bool false }
+  | b = UNIT { Unit }
   | l = NIL { Nil }
   | e1 = expr SEMICOLON e2 = expr {Seq (e1, e2)}
   | LAMBDA v = ID PERIOD e = expr {Abs (v, e)}
   | LET v = ID EQUALS e1 = expr IN e2 = expr {Let (v, e1, e2)}
   | LETREC v = ID EQUALS FUN a = fun_args ARROW e = expr IN e1 = expr{Letrec (v, a, e, e1)} 
   | IF e1 = expr THEN e2 = expr ELSE e3 = expr {If (e1, e2, e3)}
+  | WHILE g = expr DO e = expr DONE {While(g, e)}
   | FUN a = fun_args ARROW e = expr {Fun (a, e)}
   | e1 = expr e2 = expr %prec APP {App (e1, e2)}
   | e1 = expr b = binop e2 = expr {Bop (e1, b, e2)}

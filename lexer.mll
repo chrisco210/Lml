@@ -16,6 +16,9 @@ rule read =
   | "if" {IF}
   | "else" {ELSE}
   | "then" {THEN}
+  | "while" {WHILE}
+  | "do" {DO}
+  | "done" {DONE}
   | "<=" { LTEQ }
   | ">=" { GTEQ }
   | "<" { LT }
@@ -44,6 +47,7 @@ rule read =
   | "hd" { HD }
   | "tl" { TL }
   | "[]" { NIL }
+  | "unit" { UNIT }
   | ";" {SEMICOLON}
   | "(*" { comment 0 lexbuf } 
   | id { ID (Lexing.lexeme lexbuf) }

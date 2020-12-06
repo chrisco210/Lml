@@ -24,6 +24,7 @@ type lamcom =
   | Var of var
   | Int of int
   | Bool of bool
+  | Unit
   | Bop of bop * lamcom * lamcom
   | Uop of uop * lamcom
   | If of lamcom * lamcom * lamcom

@@ -107,7 +107,33 @@ let rec convert_cps_init (e : iast) : iast =
          )
         )
   | Ref (e) -> failwith "Unimplemented convert_cps_init"
-  | While (e1, e2) -> failwith "Unimplemented convert_cps_init"
+  | While (b, e') -> 
+    let zcomb = Lam ("**f", 
+                     App (
+                       (Lam ("**x", App (Var "**f", Lam ("**y", App (App (Var "**x", Var "**x"), Var "**y"))))), 
+                       (Lam ("**x", App (Var "**f", Lam ("**y", App (App (Var "**x", Var "**x"), Var "**y"))))) 
+                     )
+                    ) in 
+    let k = free_var () in 
+    let f = free_var () in 
+    let g = free_var () in 
+    Lam (k,
+         App (
+           zcomb,
+           Lam (f,
+                App (
+                  convert_cps_init b,
+                  Lam (g,
+                       If (
+                         Var g,
+                         App (convert_cps_init e', Var f),
+                         App (Var k, Unit)
+                       )
+                      )
+                )
+               )
+         )
+        )
   | Assign (e1, e2) -> failwith "Unimplemented convert_cps_init"
   | Break -> failwith "Unimplemented convert_cps_init"
   | Continue -> failwith "Unimplemented convert_cps_init"
@@ -120,6 +146,9 @@ let rec convert_cps_init (e : iast) : iast =
   | Bool b -> 
     let k = free_var () in 
     Lam (k, App (Var k, Bool b))
+  | Unit -> 
+    let k = free_var () in 
+    Lam (k, App (Var k, Unit))
 
 (** [convert_cps_vars s e] converts an intermediate ast into a de bruijn AST*)
 let rec convert_cps_vars (s : ivar list) (e : iast) : lamcom = 
@@ -153,8 +182,9 @@ let rec convert_cps_vars (s : ivar list) (e : iast) : lamcom =
     end
   | Int i -> Int i
   | Bool b -> Bool b
+  | Unit -> Unit
 
 (** [convert_cps e] converts an intermediate ast into a lambda expression in 
     continuation passing style.*)
 let rec convert_cps (e : iast) : lamcom =
-  let x = e |> convert_cps_init |> convert_cps_vars [] in print_endline "finished converting"; x
+  e |> convert_cps_init |> convert_cps_vars [] 

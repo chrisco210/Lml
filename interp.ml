@@ -13,6 +13,7 @@ let rec shift (i : var) (c : int) (e : lamcom) : lamcom =
   | Var n -> if (n < c) then Var n else Var (n + i)
   | Int n -> Int n
   | Bool b -> Bool b
+  | Unit -> Unit
   | Bop (op, l, r) -> Bop (op, shift i c l, shift i c r)
   | Uop (op, e) -> Uop (op, shift i c e)
   | If (b, etrue, efalse) -> If (shift i c b, shift i c etrue, shift i c efalse)
@@ -25,6 +26,7 @@ let rec sub (e1 : lamcom) (e2 : lamcom) (m : var) : lamcom =
   | Var n -> if n = m then e2 else Var n
   | Int n -> Int n
   | Bool b -> Bool b
+  | Unit -> Unit
   | If (b, etrue, efalse) -> If ((sub b e2 m), (sub etrue e2 m), (sub efalse e2 m))
   | Bop (op, l, r) -> Bop (op, sub l e2 m, sub r e2 m)
   | Uop (op, e) -> Uop (op, sub e e2 m)
@@ -47,6 +49,7 @@ let rec eval (exp : lamcom) : lamcom =
   | Int n -> Int n
   | Bool b -> Bool b
   | Lam e -> Lam e
+  | Unit -> Unit
   (* The two additional extensions *)
   | If (b, etrue, efalse) -> begin 
       match eval b with 

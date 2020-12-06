@@ -86,7 +86,7 @@ let rec convert_var (e : expr) : iast =
       | _ -> Uop (lambop_of_uop u, convert_var e')
     end
   (* Everything below here is unimplemented for alpha *)
-  | Letg(v,e') -> failwith "unimplemented in beta"
+  | Letg(v,e') -> failwith "unimplemented"
   (* Using the encoding from g from 
      https://en.wikipedia.org/wiki/Church_encoding#Church_pairs *)
   | Tuple(e1,e2) -> 
@@ -99,11 +99,12 @@ let rec convert_var (e : expr) : iast =
     in proj_rec (convert_var e') n
   | Seq(e1,e2) -> Seq(convert_var e1, convert_var e2)
   | Ref(e') -> failwith "unimplemented in gamma"
-  | While(e1,e2) -> failwith "unimplemented in gamma"
+  | While(e1,e2) -> While (convert_var e1, convert_var e2)
   | Assign(e1,e2) -> failwith "unimplemented in gamma"
   | Break -> failwith "unimplemented in gamma"
   | Continue -> failwith "unimplemented in gamma"
   | Nil -> App (App (pair,  Bool true), Bool true)
+  | Unit -> Unit
 
 
 let rec convert (e : expr) : lamcom = 
