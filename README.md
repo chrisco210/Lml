@@ -65,13 +65,6 @@ addtwo 2
 ```
 This evaluates to 4
 
-Functions are values, and will halt evaluation:
-```
-let x = fun a -> a in
-x
-```
-Will evaluate to `L . $0`, which is the identity function in De Bruijn notation.
-
 You can also write explicit recursive functions.  The same factorial function
 as above can be written as:
 ```
@@ -91,24 +84,26 @@ uop ::= ~ | ~- | !
 
 e ::= (e)
       | let x = e1 in e2
+      | let rec x = e1 in e2
       | fun x1 ... xn -> e
       | e1 e2
       | if e1 then e2 else e3
-      | while e1 do e2
+      | while e1 do e2 done
       | break
       | continue
       | e1; e2
       | ref e
       | e1 := e2
       | x
-      | Nil
+      | []                   <-- Nil
       | L x . e
       | let x = e
-      | (e1, e2, ... en)
+      | (e1, e2)
       | e#n
       | e1 bop e2
       | uop e
       | n
+      | ()                   <-- Unit
       | true
       | false
 ```
@@ -118,7 +113,7 @@ cons operator to append to a list, `e#n` extracts the `n`th item from a tuple
 `e`. For unary operators,  `~` is logical negation, while `~-` is integer 
 negation, and `!` is dereferencing.
 
-You can do OCaml style comments using the `(* comment *)` syntax.
+You can do OCaml style comments using the `(* ocaml comment *)` syntax.
 
 ## Target Lambda calculus
 The target lambda calculus is De Bruijn lambda calculus extended with integers,
@@ -128,10 +123,12 @@ booleans, operators, and if statements:
 e ::= x
       | n
       | b
+      | ()
       | $i <-- This is a De Bruijn variable number
       | if e1 then e2 else e3
       | L . e
       | e1 e2
+      | if e1 then e2 else e3
       | e1 bop e2
       | uop e
 ```

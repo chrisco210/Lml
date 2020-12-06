@@ -75,9 +75,8 @@ let rec convert_var (e : expr) : iast =
       | Tl -> App (snd, App (snd, convert_var e'))
       | _ -> Uop (lambop_of_uop u, convert_var e')
     end
-  (* Everything below here is unimplemented for alpha *)
   | Letg(v,e') -> failwith "unimplemented"
-  (* Using the encoding from g from 
+  (* Using the encoding from 
      https://en.wikipedia.org/wiki/Church_encoding#Church_pairs *)
   | Tuple(e1,e2) -> 
     App (App (pair,  (convert_var e1)), convert_var e2)
