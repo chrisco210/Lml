@@ -1,4 +1,4 @@
-MODULES= lambdaast interp ast convert pprint parse church
+MODULES= lambdaast interp ast convert pprint parse church convertcps
 OBJECTS=$(MODULES:=.cmo)
 MLS=$(MODULES:=.ml)
 MLIS=$(MODULES:=.mli)

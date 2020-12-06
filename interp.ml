@@ -13,18 +13,20 @@ let rec shift (i : var) (c : int) (e : lamcom) : lamcom =
   | Var n -> if (n < c) then Var n else Var (n + i)
   | Int n -> Int n
   | Bool b -> Bool b
+  | Unit -> Unit
   | Bop (op, l, r) -> Bop (op, shift i c l, shift i c r)
   | Uop (op, e) -> Uop (op, shift i c e)
   | If (b, etrue, efalse) -> If (shift i c b, shift i c etrue, shift i c efalse)
 
 (** [sub e1 e2 n] substitutes [e2] for [n] in [e1]*)
-let rec sub (e1 : lamcom) (e2 : lamcom) (m : var) = 
+let rec sub (e1 : lamcom) (e2 : lamcom) (m : var) : lamcom = 
   match e1 with 
   | App (el, er) -> App ((sub el e2 m), (sub er e2 m))
   | Lam e -> Lam (sub e (shift 1 0 e2) (m + 1))
   | Var n -> if n = m then e2 else Var n
   | Int n -> Int n
   | Bool b -> Bool b
+  | Unit -> Unit
   | If (b, etrue, efalse) -> If ((sub b e2 m), (sub etrue e2 m), (sub efalse e2 m))
   | Bop (op, l, r) -> Bop (op, sub l e2 m, sub r e2 m)
   | Uop (op, e) -> Uop (op, sub e e2 m)
@@ -47,6 +49,7 @@ let rec eval (exp : lamcom) : lamcom =
   | Int n -> Int n
   | Bool b -> Bool b
   | Lam e -> Lam e
+  | Unit -> Unit
   (* The two additional extensions *)
   | If (b, etrue, efalse) -> begin 
       match eval b with 
@@ -90,5 +93,4 @@ let rec eval (exp : lamcom) : lamcom =
           | Int n -> Int (-n)
           | _ -> failwith ("Neg must take an integer: " ^ string_of_exp (Uop (op, e)))
         end
-      | Deref -> failwith "unimplemented in gamma"
     end

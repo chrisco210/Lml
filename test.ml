@@ -4,12 +4,12 @@ open Interp
 open Church
 
 (* Just the identity function *)
-let id_fun = Lam (Var 0)
+let id_fun : lamcom = Lam (Var 0)
 
 (* Y ≜ 𝜆 𝑓 . (𝜆𝑥. 𝑓 (𝑥 𝑥)) (𝜆𝑥. 𝑓 (𝑥 𝑥)). *)
 (* 𝐺 ≜ 𝜆 𝑓 . 𝜆𝑛. if 𝑛 = 0 then 1 else 𝑛 × (𝑓 (𝑛 − 1)) *)
 (* We use the Y combinator because we implemented call by name semantics *)
-let ycomb = Lam (
+let ycomb : lamcom = Lam (
     App (
       (Lam (App (Var 1, App (Var 0, Var 0)))), 
       (Lam (App (Var 1, App (Var 0, Var 0))))
@@ -17,7 +17,7 @@ let ycomb = Lam (
   )
 
 (* The fixed point of this function is the factorial function *)
-let fact' = Lam (
+let fact' : lamcom  = Lam (
     Lam (
       If (
         (Bop (Equals, (Var 0), (Int 0))),
@@ -38,10 +38,10 @@ let fact' = Lam (
     )
   )
 
-let fact = App (ycomb, fact')
+let fact : lamcom = App (ycomb, fact')
 
 (* The fixed point of this raises a base to an exponent  *)
-let pow' = 
+let pow' : lamcom = 
   Lam (
     Lam (
       Lam (
@@ -73,22 +73,22 @@ let pow' =
     )
   )
 
-let pow = App (ycomb, pow')
+let pow : lamcom = App (ycomb, pow')
 
 (* Nested function *)
-let nested = App (Lam (Lam (Var 1)), Int 4)
-let deepnested = Lam (Lam (Lam (Lam (Var 2))))
+let nested : lamcom = App (Lam (Lam (Var 1)), Int 4)
+let deepnested : lamcom = Lam (Lam (Lam (Lam (Var 2))))
 
 (* Simple first class function application and evaluation *)
-let firstclasssimple = App (Lam (Lam (App (Var 1, (App (Var 1, Var 0))))), Lam (Bop (Times, Int 2, Var 0)))
+let firstclasssimple : lamcom = App (Lam (Lam (App (Var 1, (App (Var 1, Var 0))))), Lam (Bop (Times, Int 2, Var 0)))
 
 
 (* Standard boolean encodings  *)
-let enc_true = Lam (Lam (Var 1))
-let enc_false = Lam (Lam (Var 0))
-let enc_not = Lam (App (App (Var 0, enc_false), enc_true))
-let enc_and = Lam (Lam (App (App (Var 1, Var 0), enc_false)))
-let enc_or = Lam (Lam (App (App (Var 1, enc_true), Var 0)))
+let enc_true : lamcom = Lam (Lam (Var 1))
+let enc_false : lamcom = Lam (Lam (Var 0))
+let enc_not : lamcom = Lam (App (App (Var 0, enc_false), enc_true))
+let enc_and : lamcom = Lam (Lam (App (App (Var 1, Var 0), enc_false)))
+let enc_or : lamcom = Lam (Lam (App (App (Var 1, enc_true), Var 0)))
 
 (* Generates a church numeral for n *)
 let church (n : int): lamcom = 
@@ -228,96 +228,32 @@ let parse_tests = [
   make_parse_test "let a = (1, 2) in add a" (Let ("a", Tuple (Int 1, Int 2), App (Var "add", Var "a")));
   make_parse_test "a b#0" (App (Var "a", Proj (Var "b", 0)));
   make_parse_test "let x = (1, 2) in x # 0" (Let ("x", (Tuple (Int 1, Int 2)), Proj (Var "x", 0)));
-  make_parse_test "fun a -> fun b -> b" (Fun (["a"], (Fun (["b"], Var "b"))))
+  make_parse_test "fun a -> fun b -> b" (Fun (["a"], (Fun (["b"], Var "b"))));
+  make_parse_test "1; 2" (Seq (Int 1, Int 2));
+  make_parse_test "unit" Unit;
+  make_parse_test "L x . unit" (Abs ("x", Unit));
+  make_parse_test "a b; 1" (Seq (App (Var "a", Var "b"), Int 1));
+  make_parse_test "fun x -> x; 1" (Fun (["x"], Seq (Var "x", Int 1)));
+  make_parse_test "1 + 1; 2; 3" (Seq (Seq (Bop (Int 1, Plus, Int 1), Int 2), Int 3));
+  make_parse_test "while true do 1 done" (While (Bool true, Int 1));
+  make_parse_test "while false do 1 done; 2" (Seq (While (Bool false, Int 1), Int 2));
+  make_parse_test "while false do 1; 2 done; 1" (Seq (While (Bool false, Seq (Int 1, Int 2)), Int 1))
 ]
-
-(* ------------------------ Conversion tests ----------------------------------- *)
-
-open Convert
-
-let convert_tests = [
-  "Converting ID function" >:: (fun _ -> 
-      (Ast.Abs ("x", Ast.Var "x")) |> convert |> assert_equal (Lam (Var 0))
-    );
-  "Nested lambdas" >:: (fun _ -> 
-      (Ast.Abs ("x", Ast.Abs ("y", Ast.App (Ast.Var "x", Ast.Var "y")))) 
-      |> convert |> assert_equal (Lam (Lam (App (Var 1, Var 0))))
-    );
-  "Lambda with binop" >:: (fun _ ->
-      (Ast.Abs ("x", (Ast.Bop (Ast.Var "x", Ast.Plus, Ast.Int 1))))
-      |> convert |> assert_equal (Lam (Bop (Plus, Var 0, Int 1)))
-    );
-  "Lambda with nested binops" >:: (fun _ ->
-      (Ast.Abs ("x", (Ast.Bop (Ast.Bop (Ast.Int 1, Ast.Plus, Ast.Int 2), Ast.Plus, Ast.Var "x"))))
-      |> convert |> assert_equal (Lam (Bop (Plus, Bop (Plus, Int 1, Int 2), Var 0)))
-    );
-  (* We already tested parsing above, so for convenience use parsing in the following tests *)
-  "Lambda with variable redefinition" >:: (fun _ ->
-      "L x . L y . L x . x" |> parse |> convert
-      |> assert_equal (Lam (Lam (Lam (Var 0))))
-    );
-  "Lambda with two different variables with same name at different depths" >::
-  (fun _ ->
-     "L x. x L y . L x . x y" |> parse |> convert
-     |> assert_equal (Lam (App (Var 0, Lam (Lam (App (Var 0, Var 1))))))
-  );
-  "Simple let expression" >:: (fun _ ->
-      "let x = 4 in x" |> parse |> convert
-      |> assert_equal (Lambdaast.App (Lam (Var 0), Int 4))
-    );
-  "Omega conversion" >:: (fun _ ->
-      let partial = Lam (App (Var 0, Var 0)) in
-      "(L x . x x) (L x . x x)" |> parse |> convert
-      |> assert_equal (Lambdaast.App (partial, partial))
-    );
-  "multi arg function" >:: (fun _ ->
-      "fun a b c -> 1" |> parse |> convert
-      |> assert_equal (Lam (Lam (Lam (Int 1))))
-    );
-  (* NOTE: Maybe we should make this kind of thing a syntax error *)
-  "multi arg function redefinition selects correctly" >:: (fun _ ->
-      "fun x y x -> x" |> parse |> convert
-      |> assert_equal (Lam (Lam (Lam (Var 0))))
-    );
-  "Multi arg function selects correct arguments" >:: (fun _ -> 
-      "fun a b c -> a b c" |> parse |> convert
-      |> assert_equal (Lam (Lam (Lam (App (App (Var 2, Var 1), Var 0)))))
-    );
-  "Or is converted correctly" >:: (fun _ -> 
-      "L x . L y . x || y" |> parse |> convert 
-      |> assert_equal (Lam (Lam (Lambdaast.If (Var 1, Bool true, Var 0))))
-    );
-  "And is converted correctly" >:: (fun _ -> 
-      "L x . L y . x && y" |> parse |> convert 
-      |> assert_equal (Lam (Lam (Lambdaast.If (Var 1, Var 0, Bool false))))
-    );
-  "Pair creation is correctly implemented" >:: (fun _ -> 
-      "(1, 2)" |> parse |> convert 
-      |> assert_equal (Lambdaast.App (App (Church.pair, Int 1), Int 2))
-    );
-  "Pair creation is correctly implemented" >:: (fun _ -> 
-      "(L x . x, L y . y)" |> parse |> convert 
-      |> assert_equal (Lambdaast.App (App (Church.pair, Lam (Var 0)), Lam (Var 0)))
-    );
-
-]
-
 (* Conversion and execution tests *)
-(* These are more simple because we test the interpreter parsing and conversion 
-   seperately above. *)
+open Convert
 
 (* Y ≜ 𝜆 𝑓 . (𝜆𝑥. 𝑓 (𝑥 𝑥)) (𝜆𝑥. 𝑓 (𝑥 𝑥)). *)
 (* 𝐺 ≜ 𝜆 𝑓 . 𝜆𝑛. if 𝑛 = 0 then 1 else 𝑛 × (𝑓 (𝑛 − 1)) *)
 
-let ycombstr = "L f . (L x . f (x x)) (L x . f (x x))"
+let zcombstr = "L f . (L x . f (L y . x x y)) (L x . f (L y . x x y))"
 
 let exec_tests = [
   "Simple application test" >:: (fun _ -> 
       "(L x . x) 1" |> parse |> convert |> eval
       |> assert_equal (Lambdaast.Int 1)
     );
-  "Simple Y combinator test" >:: (fun _ ->
-      "let Y = " ^ ycombstr ^ " in let G = L f . L n . if n = 0 then 1 else n * (f (n - 1)) in Y G 4"
+  "Simple Z combinator test" >:: (fun _ ->
+      "let Z = " ^ zcombstr ^ " in let G = L f . L n . if n = 0 then 1 else n * (f (n - 1)) in Z G 4"
       |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 24)
     );
   "Let expressions and functions" >:: (fun _ ->
@@ -331,10 +267,6 @@ let exec_tests = [
   "Partial application" >:: (fun _ ->
       "let add = fun x y -> x + y in let addtwo = add 2 in addtwo 2"
       |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 4)
-    );
-  "Functions are values" >:: (fun _ ->
-      "let x = fun a -> a in x" |> parse |> convert |> eval
-      |> assert_equal (Lam (Var 0))
     );
   "Recursive definitions work" >:: (fun _ -> 
       "let rec fact = fun n -> if n = 0 then 1 else n * fact (n - 1) in fact 4"
@@ -369,6 +301,10 @@ let exec_tests = [
       "(1, (2, 3))#1#1" 
       |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 3)
     );
+  "More nested tuples" >:: (fun _ ->
+      "let a = ((1, 2),(3,4)) in a#0#0 + a#0#1 + a#1#0 + a#1#1"
+      |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 10)
+    );
   "Curried function test" >:: (fun _ -> 
       "let curry = 
       fun f -> 
@@ -379,9 +315,16 @@ let exec_tests = [
       let addcur = curry add in
       addcur (1, 2)
       " |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 3)
+    );
+  "List operations" >:: (fun _ -> 
+      "hd (1::2::3::[])" |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 1)
     )
 ]
 
-let suite = "LML tests" >::: List.concat [lc_interpret_tests; parse_tests; convert_tests; exec_tests]
+let suite = "LML tests" >::: List.concat [
+    lc_interpret_tests; 
+    parse_tests; 
+    exec_tests
+  ]
 
 let _ = run_test_tt_main suite

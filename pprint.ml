@@ -14,7 +14,6 @@ let string_of_bop (b : bop) : string = match b with
 let string_of_uop (u : uop) : string = match u with
   | Not -> "~"
   | Neg -> "~-"
-  | Deref -> "!"
 
 (** [string_of_exp e] is a string representing the lambda calculus expression e
 *)
@@ -28,4 +27,5 @@ let rec string_of_exp (e : lamcom) : string =
   | If (b, etrue, efalse) -> "IF " ^ (string_of_exp b) ^ " THEN " ^ (string_of_exp etrue) ^ " ELSE " ^ (string_of_exp efalse)
   | Bop (bop, l, r) -> (string_of_exp l) ^ (string_of_bop bop) ^ (string_of_exp r)
   | Uop (uop, e) -> (string_of_uop uop) ^ (string_of_exp e)
+  | Unit -> "unit"
 
