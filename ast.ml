@@ -30,6 +30,7 @@ type expr =
   | App of expr * expr
 
   | Nil
+  | IsNil of expr
 
   (* Literals *)
   | Var of var
@@ -79,6 +80,7 @@ let rec string_of_ast (e : expr) : string =
   | Break -> "break"
   | Continue -> "continue"
   | Nil -> "[]"
+  | IsNil(e) -> "is_nil" ^ (string_of_ast e)
   | Letg (v, e) -> "let " ^ v ^ " = " ^ (string_of_ast e)
   | Unit -> "unit"
 and string_of_uop (o : uop) : string =

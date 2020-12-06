@@ -6,7 +6,8 @@ let white = [' ' '\t' '\n']+
 let digit = ['0'-'9']
 let int = '-'? digit+
 let letter = ['a'-'z' 'A'-'Z']
-let id = letter+
+let varchars = letter | '_'
+let id = (varchars+ "'"?)
 
 rule read = 
   parse
@@ -52,6 +53,7 @@ rule read =
   | "hd" { HD }
   | "tl" { TL }
   | "[]" { NIL }
+  | "is_nil" { IS_NIL }
   | "unit" { UNIT }
   | ";" {SEMICOLON}
   | "(*" { comment 0 lexbuf } 

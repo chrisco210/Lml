@@ -58,6 +58,7 @@ open Ast
 %token TL
 
 %token NIL
+%token IS_NIL
 
 /* References */
 %token COLONEQUALS
@@ -90,7 +91,7 @@ open Ast
 /* Thanks to https://ptival.github.io/2017/05/16/parser-generators-and-function-application/
   for how to make function application left associative
  */
-%nonassoc LAMBDA IF WHILE LET LETREC LPAREN FUN ID INT TRUE FALSE NOT NEG HD TL NIL UNIT CONTINUE BREAK REF DEREF
+%nonassoc LAMBDA IF WHILE LET LETREC LPAREN FUN ID INT TRUE FALSE NOT NEG HD TL NIL UNIT CONTINUE BREAK REF DEREF IS_NIL
 
 %nonassoc APP
 
@@ -129,6 +130,7 @@ expr:
   | b = FALSE { Bool false }
   | b = UNIT { Unit }
   | l = NIL { Nil }
+  | IS_NIL e = expr {IsNil(e)}
   | BREAK {Break}
   | CONTINUE {Continue}
 

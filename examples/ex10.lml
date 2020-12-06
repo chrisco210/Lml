@@ -1,0 +1,10 @@
+(* More fun with folds, taken from the CS3110 wiki *)
+(* This takes a while to run, but does implement a map and reverse function *)
+let rec fold_left = fun op acc lst ->
+  if is_nil lst then acc else fold_left op (op acc (hd lst)) (tl lst) 
+in 
+let map_rev = fun f l -> fold_left (fun a x -> (f x)::a) [] l in
+let theList = (1::2::3::[]) in
+let mapped = map_rev (fun x -> x + 1) theList in 
+fold_left (fun a b -> a + b) 0 mapped
+(* Evaluates to 9 *)

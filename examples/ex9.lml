@@ -1,0 +1,6 @@
+(* An implementation of a fold left, which is slow because of the list encoding,
+   but does work *)
+let rec fold_left = fun op acc lst ->
+  if is_nil lst then acc else fold_left op (op acc (hd lst)) (tl lst) in 
+fold_left (fun a b -> a + b) 0 (1::2::3::[])
+(* Evaluates to 6 *)

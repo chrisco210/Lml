@@ -71,16 +71,8 @@ let rec convert_var (e : expr) : iast =
     List.fold_right (fun v acc -> Lam (v, acc)) vs converted_body
   | Uop(u,e') -> begin
       match u with
-      | Hd -> let x = convert_var e'  in begin match x with
-          | App (App (_,  Bool b), e2) when b = false -> App (fst, e2)
-          | App (App (_,  Bool b), e2) -> x
-          | _ -> failwith "Mismatched type for hd operation"
-        end
-      | Tl -> let x = convert_var e'  in begin match x with
-          | App (App (_,  Bool b), e2) when b = false -> App (snd, e2)
-          | App (App (_,  Bool b), e2) -> x
-          | _ -> failwith "Mismatched type for tl operation"
-        end
+      | Hd -> App (fst, App (snd, convert_var e'))
+      | Tl -> App (snd, App (snd, convert_var e'))
       | _ -> Uop (lambop_of_uop u, convert_var e')
     end
   (* Everything below here is unimplemented for alpha *)
@@ -103,6 +95,7 @@ let rec convert_var (e : expr) : iast =
   | Break -> Break
   | Continue -> Continue
   | Nil -> App (App (pair,  Bool true), Bool true)
+  | IsNil(e) -> App (fst, convert_var e)
   | Unit -> Unit
 
 let rec convert (e : expr) : lamcom = 

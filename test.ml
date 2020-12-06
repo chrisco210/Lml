@@ -190,6 +190,7 @@ let make_parse_test (s : string) (e : expr) =
 (* Sorry for the long line lengths, I think it looks better this way *)
 (* These programs may or may not be valid, they are just to test the parser *)
 let parse_tests = [
+  make_parse_test "_x'" (Var "_x'");
   make_parse_test "f a b c" (App (App (App (Var "f", Var "a"), Var "b"), Var "c"));
   make_parse_test "f a (b c)" (App (App (Var "f", Var "a"), App (Var "b", Var "c")));
   make_parse_test "(L x . x) (L y . y) (L z . z)" (App (App ((Abs ("x", Var "x")), (Abs ("y", Var "y"))), (Abs ("z", Var "z"))));
@@ -241,10 +242,6 @@ let parse_tests = [
 ]
 (* Conversion and execution tests *)
 open Convert
-
-(* Y ≜ 𝜆 𝑓 . (𝜆𝑥. 𝑓 (𝑥 𝑥)) (𝜆𝑥. 𝑓 (𝑥 𝑥)). *)
-(* 𝐺 ≜ 𝜆 𝑓 . 𝜆𝑛. if 𝑛 = 0 then 1 else 𝑛 × (𝑓 (𝑛 − 1)) *)
-
 let zcombstr = "L f . (L x . f (L y . x x y)) (L x . f (L y . x x y))"
 
 let exec_tests = [
@@ -318,7 +315,33 @@ let exec_tests = [
     );
   "List operations" >:: (fun _ -> 
       "hd (1::2::3::[])" |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 1)
-    )
+    );
+  "List operations" >:: (fun _ ->
+      "hd (tl (1::2::3::[]))" |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 2)
+    );
+  "List as variable" >:: (fun _ ->
+      "let x = 1::2::3::[] in hd x" |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 1)
+    );
+  "is_nil is correct" >:: (fun _ ->
+      "is_nil []" |> parse |> convert |> eval |> assert_equal (Lambdaast.Bool true)
+    );
+  "is_nil is correct" >:: (fun _ ->
+      "is_nil (1::[])" |> parse |> convert |> eval |> assert_equal (Lambdaast.Bool false)
+    );
+  "Boolean and encodings" >:: (fun _ -> 
+      "(if false && false then 1 else 0) 
+      + 10 * (if false && true then 1 else 0)
+       + 100 * (if true && false then 1 else 0) 
+       + 1000 * (if true && true then 1 else 0)"
+      |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 1000)
+    );
+  "Boolean or encodings" >:: (fun _ -> 
+      "(if false || false then 1 else 0) 
+      + 10 * (if false || true then 1 else 0)
+       + 100 * (if true || false then 1 else 0) 
+       + 1000 * (if true || true then 1 else 0)"
+      |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 1110)
+    );
 ]
 
 let suite = "LML tests" >::: List.concat [
