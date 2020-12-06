@@ -157,4 +157,4 @@ let rec convert_cps_vars (s : ivar list) (e : iast) : lamcom =
 (** [convert_cps e] converts an intermediate ast into a lambda expression in 
     continuation passing style.*)
 let rec convert_cps (e : iast) : lamcom =
-  e |> convert_cps_init |> convert_cps_vars []
+  let x = e |> convert_cps_init |> convert_cps_vars [] in print_endline "finished converting"; x

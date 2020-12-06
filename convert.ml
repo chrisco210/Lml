@@ -45,17 +45,17 @@ let rec convert_var (e : expr) : iast =
   | Abs(v,e') -> Lam (v, convert_var e')
   | App(e1,e2) -> App (convert_var e1, convert_var e2)
   | Let(v,e1,e2) -> (App (Lam (v, convert_var e2), convert_var e1)) 
-  (* Uses the Y combinator for recursion *)
+  (* Uses the Z combinator for recursion *)
   | Letrec (v, va, e, b) -> 
-    let ycomb = Lam ("**f", 
+    let zcomb = Lam ("**f", 
                      App (
-                       (Lam ("**x", App (Var "**f", App (Var "**x", Var "**x")))), 
-                       (Lam ("**x", App (Var "**f", App (Var "**x", Var "**x"))))
+                       (Lam ("**x", App (Var "**f", Lam ("**y", App (App (Var "**x", Var "**x"), Var "**y"))))), 
+                       (Lam ("**x", App (Var "**f", Lam ("**y", App (App (Var "**x", Var "**x"), Var "**y"))))) 
                      )
                     ) in 
     let converted = convert_var (Abs (v, Fun (va, e)))  in 
     let convbody = convert_var (Abs (v, b))  in
-    App (convbody, App (ycomb, converted))
+    App (convbody, App (zcomb, converted))
   | If(e1,e2,e3) -> If (convert_var e1, convert_var e2, convert_var e3)
   | Var(v) -> Var v
   | Int(n) -> Int n
