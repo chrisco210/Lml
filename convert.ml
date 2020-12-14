@@ -101,4 +101,4 @@ let rec convert_var (e : expr) : iast =
 
 let rec convert (e : expr) : lamcom = 
   let translated = convert_var e |> convert_cps in 
-  App (translated, Lam (Var 0))
+  App (App (translated, Lam (Lam (Var 1))), Int 0)

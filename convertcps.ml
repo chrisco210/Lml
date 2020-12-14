@@ -1,8 +1,9 @@
 open Lambdaast
 open Iast
 
-let counter = ref 0
 
+
+let counter = ref 0
 (** [free_var] generates a fresh variable that has not been used before.  
     It will never match a user defined variable because it includes characters
     that cannot be included in user defined variable names. *)
@@ -10,37 +11,74 @@ let free_var () : ivar =
   counter := !counter + 1; 
   "*/" ^ (string_of_int !counter) 
 
+
+(** [convert_cps_init] This converts an iast into a iast in CPS style with 
+    mutable slot passing. 
+
+    These look like total gibberish so if you want to see the translations in 
+    a readable "math" syntax, see TRANSLATION.md
+*)
 let rec convert_cps_init (e : iast) : iast = 
   match e with
   | App (e1, e2) -> 
-    let k = free_var () in
-    let f = free_var () in
-    let v = free_var () in
-    Lam (k, 
-         App (
-           convert_cps_init e1, 
-           Lam (
-             f, 
-             App (
-               convert_cps_init e2,
-               (Lam (v, App (App (Var f, Var v), Var k)))
+    let k = free_var () in 
+    let m = free_var () in 
+    let k' = free_var () in 
+    let m' = free_var () in 
+    let k'' = free_var () in 
+    let m'' = free_var () in 
+    Lam (k,
+         Lam (m,
+              App (
+                App (
+                  (convert_cps_init e1),
+                  (Lam (k', 
+                        Lam (m',
+                             App (
+                               App (
+                                 convert_cps_init e2, 
+                                 Lam (k'',
+                                      Lam (m'',
+                                           App (
+                                             App (
+                                               App (Var k', Var k''), Var k
+                                             ), Var m''
+                                           )
+                                          )
+                                     )
+                               ),
+                               Var m'
+                             )
+                            )
+                       ))
+                ),
+                Var m
+              )
              )
-           )
-         )
         )
   | Lam (v, e') -> 
-    let k = free_var () in
-    let k' = free_var () in
-    Lam (k, 
-         App (Var k, 
-              Lam (v,
-                   Lam (k',
-                        App (
-                          convert_cps_init e',
-                          Var k'
-                        )
-                       )
-                  )
+    let k = free_var () in 
+    let m = free_var () in 
+    let k' = free_var () in 
+    let m' = free_var () in 
+    Lam (k,
+         Lam (m,
+              App (
+                App (
+                  Var k, 
+                  Lam (v, 
+                       Lam(k',
+                           Lam (m',
+                                App (
+                                  App (convert_cps_init e', Var k'),
+                                  Var m'
+                                )
+                               )
+                          )
+                      )
+                ),
+                Var m
+              )
              )
         )
   | Bop (b, e1, e2) -> 
@@ -141,18 +179,46 @@ let rec convert_cps_init (e : iast) : iast =
   | Continue -> failwith "Unimplemented convert_cps_init"
   | Var v -> 
     let k = free_var () in 
-    Lam (k, App (Var k, Var v))
+    let m = free_var () in
+    Lam (k, Lam (m, App (App (Var k, Var v), Var m)))
   | Int i -> 
     let k = free_var () in 
-    Lam (k, App (Var k, Int i))
+    let m = free_var () in
+    Lam (k, Lam (m, App (App (Var k, Int i), Var m)))
   | Bool b -> 
     let k = free_var () in 
-    Lam (k, App (Var k, Bool b))
+    let m = free_var () in
+    Lam (k, Lam (m, App (App (Var k, Bool b), Var m)))
   | Unit -> 
     let k = free_var () in 
-    Lam (k, App (Var k, Unit))
-  | Get -> failwith "Unimplemented"
-  | Set(e) -> failwith "Unimplemented"
+    let m = free_var () in
+    Lam (k, Lam (m, App (App (Var k, Unit), Var m)))
+  | Get -> 
+    let k = free_var () in 
+    let m = free_var () in 
+    Lam (k, Lam (m, App (App (Var k, Var m), Var m)))
+  | Set(e) ->
+    let k = free_var () in
+    let m = free_var () in
+    let k' = free_var () in 
+    let m' = free_var () in 
+    Lam (k, 
+         Lam (m, 
+              App (
+                App (
+                  convert_cps_init e,
+                  (
+                    Lam (k', 
+                         Lam (m', 
+                              App (App (Var k, Unit), Var k')
+                             )
+                        )
+                  )
+                ),
+                Var m
+              )
+             )
+        )
 
 (** [convert_cps_vars s e] converts an intermediate ast into a de bruijn AST*)
 let rec convert_cps_vars (s : ivar list) (e : iast) : lamcom = 
