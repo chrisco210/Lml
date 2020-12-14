@@ -82,67 +82,142 @@ let rec convert_cps_init (e : iast) : iast =
              )
         )
   | Bop (b, e1, e2) -> 
-    let k = free_var () in
-    let n = free_var () in 
-    let m = free_var () in
-    Lam (k, 
-         App (
-           convert_cps_init e1,
-           Lam (n,
+    let k = free_var () in 
+    let m = free_var () in 
+    let k' = free_var () in 
+    let m' = free_var () in 
+    let k'' = free_var () in 
+    let m'' = free_var () in 
+    Lam (k,
+         Lam (m,
+              App (
                 App (
-                  convert_cps_init e2,
-                  Lam (m, 
-                       App (
-                         Var k,
-                         Bop (b, Var n, Var m)
-                       )
-                      )
-                )
-               )
-         )
+                  (convert_cps_init e1),
+                  (Lam (k', 
+                        Lam (m',
+                             App (
+                               App (
+                                 convert_cps_init e2, 
+                                 Lam (k'',
+                                      Lam (m'',
+                                           App (
+                                             App (
+                                               Var k, (Bop (b, Var k', Var k''))
+                                             ), Var m''
+                                           )
+                                          )
+                                     )
+                               ),
+                               Var m'
+                             )
+                            )
+                       ))
+                ),
+                Var m
+              )
+             )
         )
   | Uop (u, e') -> 
-    let k = free_var () in
-    let n = free_var () in 
-    Lam (k,
-         App (
-           convert_cps_init e',
-           Lam (n, 
+    let k = free_var () in 
+    let m = free_var () in 
+    let k' = free_var () in 
+    let m' = free_var () in 
+    Lam (k, 
+         Lam (m,
+              App (
                 App (
-                  Var k,
-                  Uop (u, Var n)
-                )
-               )
-         )
+                  (convert_cps_init e'),
+                  (Lam (k',
+                        Lam (m', 
+                             App (
+                               App (
+                                 Var k,
+                                 Uop (u, Var k')
+                               ),
+                               Var m'
+                             )
+                            )
+                       ))
+                ),
+                Var m
+              )
+             )
         )
   | If (b, e1, e2) -> 
     let k = free_var () in 
-    let g = free_var () in 
+    let m = free_var () in 
+    let k' = free_var () in 
+    let m' = free_var () in 
+    let k'' = free_var () in 
+    let m'' = free_var () in 
     Lam (k, 
-         App (
-           convert_cps_init b,
-           Lam (g,
-                If(
-                  Var g,
-                  App (convert_cps_init e1, Var k),
-                  App (convert_cps_init e2, Var k) 
-                )
-               )
-         )
+         Lam (m, 
+              App (
+                App (
+                  convert_cps_init b,
+                  Lam (k', 
+                       Lam (m',
+                            If (Var k',
+                                App (
+                                  App (
+                                    convert_cps_init e1,
+                                    Lam (k'',
+                                         Lam (m'',
+                                              App (
+                                                App (Var k, Var k''),
+                                                Var m''
+                                              )
+                                             )
+                                        )
+                                  ),
+                                  Var m'
+                                ),
+                                App (
+                                  App (
+                                    convert_cps_init e2,
+                                    Lam (k'',
+                                         Lam (m'',
+                                              App (
+                                                App (Var k, Var k''),
+                                                Var m''
+                                              )
+                                             )
+                                        )
+                                  ),
+                                  Var m'
+                                )
+                               )
+                           )
+                      )
+                ),
+                Var m
+              )
+             )
         )
   | Seq (e1, e2) -> 
     let k = free_var () in 
-    let f = free_var () in 
+    let m = free_var () in 
+    let k' = free_var () in 
+    let m' = free_var () in 
     Lam (k,
-         App (
-           convert_cps_init e1,
-           Lam (f,
+         Lam (m,
+              App (
                 App (
-                  convert_cps_init e2,
-                  Var k
-                )
-               )
-         )
+                  convert_cps_init e1, 
+                  Lam (k', 
+                       Lam (m',
+                            App (
+                              App (
+                                convert_cps_init e2,
+                                Var k
+                              ),
+                              Var m'
+                            )
+                           )
+                      )
+                ), Var m
+              )
+             )
         )
   | Ref (e) -> failwith "Unimplemented convert_cps_init"
   | Deref (e) -> failwith "Unimplemented convert_cps_init"
