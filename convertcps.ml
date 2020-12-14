@@ -151,6 +151,8 @@ let rec convert_cps_init (e : iast) : iast =
   | Unit -> 
     let k = free_var () in 
     Lam (k, App (Var k, Unit))
+  | Get -> failwith "Unimplemented"
+  | Set(e) -> failwith "Unimplemented"
 
 (** [convert_cps_vars s e] converts an intermediate ast into a de bruijn AST*)
 let rec convert_cps_vars (s : ivar list) (e : iast) : lamcom = 
@@ -186,6 +188,8 @@ let rec convert_cps_vars (s : ivar list) (e : iast) : lamcom =
   | Int i -> Int i
   | Bool b -> Bool b
   | Unit -> Unit
+  | Get -> failwith "Cannot be directly converted"
+  | Set _ -> failwith "Cannot be directly converted"
 
 (** [convert_cps e] converts an intermediate ast into a lambda expression in 
     continuation passing style.*)

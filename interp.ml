@@ -17,6 +17,8 @@ let rec shift (i : var) (c : int) (e : lamcom) : lamcom =
   | Bop (op, l, r) -> Bop (op, shift i c l, shift i c r)
   | Uop (op, e) -> Uop (op, shift i c e)
   | If (b, etrue, efalse) -> If (shift i c b, shift i c etrue, shift i c efalse)
+  | Pair (e1, e2) -> Pair (shift i c e1, shift i c e2)
+  | Proj (n, e') -> Proj(n, shift i c e')
 
 (** [sub e1 e2 n] substitutes [e2] for [n] in [e1]*)
 let rec sub (e1 : lamcom) (e2 : lamcom) (m : var) : lamcom = 
@@ -30,6 +32,8 @@ let rec sub (e1 : lamcom) (e2 : lamcom) (m : var) : lamcom =
   | If (b, etrue, efalse) -> If ((sub b e2 m), (sub etrue e2 m), (sub efalse e2 m))
   | Bop (op, l, r) -> Bop (op, sub l e2 m, sub r e2 m)
   | Uop (op, e) -> Uop (op, sub e e2 m)
+  | Pair (e, e') -> Pair(sub e e2 m, sub e' e2 m)
+  | Proj (n, e') -> Proj(n, sub e' e2 m)
 
 
 let is_val (exp : lamcom) : bool =
@@ -50,7 +54,12 @@ let rec eval (exp : lamcom) : lamcom =
   | Bool b -> Bool b
   | Lam e -> Lam e
   | Unit -> Unit
-  (* The two additional extensions *)
+  (* The three additional extensions *)
+  | Proj (n, e') -> let v = eval e' in begin match v with 
+      | Pair (v1, v2) -> if n = 0 then v1 else v2 
+      | _ -> failwith "Invalid tuple projection"
+    end
+  | Pair (e1, e2) -> Pair (eval e1, eval e2)
   | If (b, etrue, efalse) -> begin 
       match eval b with 
       | Bool true -> eval etrue

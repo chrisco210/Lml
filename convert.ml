@@ -96,6 +96,8 @@ let rec convert_var (e : expr) : iast =
   | Nil -> App (App (pair,  Bool true), Bool true)
   | IsNil(e) -> App (fst, convert_var e)
   | Unit -> Unit
+  | Get -> Get
+  | Set (e) -> Set (convert_var e)
 
 let rec convert (e : expr) : lamcom = 
   let translated = convert_var e |> convert_cps in 

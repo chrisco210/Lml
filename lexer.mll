@@ -53,6 +53,8 @@ rule read =
   | "hd" { HD }
   | "tl" { TL }
   | "[]" { NIL }
+  | "get" { GET }
+  | "set" { SET }
   | "is_nil" { IS_NIL }
   | "unit" { UNIT }
   | ";" {SEMICOLON}

@@ -27,4 +27,6 @@ type lamcom =
   | Bop of bop * lamcom * lamcom
   | Uop of uop * lamcom
   | If of lamcom * lamcom * lamcom
+  | Pair of lamcom * lamcom
+  | Proj of int * lamcom
 

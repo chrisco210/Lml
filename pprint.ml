@@ -28,4 +28,6 @@ let rec string_of_exp (e : lamcom) : string =
   | Bop (bop, l, r) -> (string_of_exp l) ^ (string_of_bop bop) ^ (string_of_exp r)
   | Uop (uop, e) -> (string_of_uop uop) ^ (string_of_exp e)
   | Unit -> "unit"
+  | Pair (e1, e2) -> "(" ^ (string_of_exp e1) ^ "," ^ (string_of_exp e2) ^ ")"
+  | Proj (n, e') -> "#" ^ (string_of_int n) ^ " " ^ (string_of_exp e')
 

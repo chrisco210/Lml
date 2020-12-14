@@ -174,6 +174,19 @@ let lc_interpret_tests = [
   "Church addition" >:: (fun _ -> 
       App (App (church_add, church 55), church 33) |> eval |> church_to_int |> assert_equal (55 + 33)
     );
+  "Pair test" >:: (fun _ ->
+      Pair (Int 1, Int 2) |> eval |> assert_equal (Pair (Int 1, Int 2))
+    );
+  "Evaluating a pair" >:: (fun _ ->
+      (App (Lam (Pair (Var 0, Var 0)), Int 1)) |> eval 
+      |> assert_equal (Pair (Int 1, Int 1))
+    );
+  "Evaluating within a pair" >:: (fun _ ->
+      Pair (
+        (App ((Lam (Var 0)), (Int 2))),
+        ((App ((App ((Lam (Lam (Bop (Plus,  Var 0, Var 1)))), (Int 2))), (Int 4))))
+      ) |> eval |> assert_equal (Pair (Int 2, Int 6))
+    )
 ]
 
 

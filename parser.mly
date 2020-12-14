@@ -65,6 +65,9 @@ open Ast
 %token DEREF
 %token REF
 
+%token GET
+%token SET
+
 /* (*Function things*) */
 %token FUN 
 %token ARROW
@@ -137,6 +140,8 @@ expr:
   | REF e = expr {Ref e}
   | DEREF e = expr {Deref e}
   | e1 = expr COLONEQUALS e2 = expr {Assign(e1, e2)}
+  | GET { Get }
+  | SET e = expr { Set(e) }
 
   | e1 = expr SEMICOLON e2 = expr {Seq (e1, e2)}
   | LAMBDA v = ID PERIOD e = expr {Abs (v, e)}

@@ -25,6 +25,9 @@ type expr =
   | Break
   | Continue
 
+  | Get 
+  | Set of expr
+
   (* Lambda calculus *)
   | Abs of var * expr
   | App of expr * expr
@@ -83,6 +86,8 @@ let rec string_of_ast (e : expr) : string =
   | IsNil(e) -> "is_nil" ^ (string_of_ast e)
   | Letg (v, e) -> "let " ^ v ^ " = " ^ (string_of_ast e)
   | Unit -> "unit"
+  | Get -> "get"
+  | Set e -> "set" ^ (string_of_ast e)
 and string_of_uop (o : uop) : string =
   match o with
   | Neg -> "~-"

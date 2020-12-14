@@ -19,3 +19,6 @@ type iast =
   | Assign of iast * iast
   | Break
   | Continue
+
+  | Get 
+  | Set of iast
