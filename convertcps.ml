@@ -222,7 +222,7 @@ let rec convert_cps_init (e : iast) : iast =
   | Ref (e) -> failwith "Unimplemented convert_cps_init"
   | Deref (e) -> failwith "Unimplemented convert_cps_init"
   | Assign (e1, e2) -> failwith "Unimplemented convert_cps_init"
-  | While (b, e') -> 
+  | While (e1, e2) -> 
     let zcomb = 
       Lam ("**f", 
            App (
@@ -231,24 +231,51 @@ let rec convert_cps_init (e : iast) : iast =
            )
           ) in 
     let k = free_var () in 
+    let m = free_var () in 
     let f = free_var () in 
-    let g = free_var () in 
+    let m' = free_var () in 
+    let b = free_var () in 
+    let m'' = free_var () in 
     Lam (k,
-         App (
-           zcomb,
-           Lam (f,
+         Lam (m,
+              App (
                 App (
-                  convert_cps_init b,
-                  Lam (g,
-                       If (
-                         Var g,
-                         App (convert_cps_init e', Var f),
-                         App (Var k, Unit)
-                       )
-                      )
-                )
-               )
-         )
+                  zcomb,
+                  (Lam (f, 
+                        Lam (m', 
+                             App (
+                               App (
+                                 (convert_cps_init e1),
+                                 (Lam (b,
+                                       Lam (m'',
+                                            If(
+                                              Var b,
+                                              (App(
+                                                  App(
+                                                    convert_cps_init e2,
+                                                    Var f
+                                                  ),
+                                                  Var m''
+                                                )),
+                                              App (
+                                                App (
+                                                  Var k,
+                                                  Unit
+                                                ),
+                                                Var m''
+                                              )
+                                            )
+                                           )
+                                      ))
+                               ),
+                               Var m'
+                             )
+                            )
+                       ))
+                ),
+                Var m
+              )
+             )
         )
   | Break -> failwith "Unimplemented convert_cps_init"
   | Continue -> failwith "Unimplemented convert_cps_init"

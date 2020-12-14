@@ -355,6 +355,25 @@ let exec_tests = [
        + 1000 * (if true || true then 1 else 0)"
       |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 1110)
     );
+  "Basic reference" >:: (fun _ ->
+      "set 1" |> parse |> convert |> eval |> assert_equal (Lambdaast.Unit)
+    );
+  "Updating refernce as applied to function" >:: (fun _ ->
+      "(fun a b c -> get) (set 1) (set 2) (set 3)" 
+      |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 3)
+    );
+  "Updating reference before bop" >:: (fun _ -> 
+      "set 1; 2 * get" 
+      |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 2)
+    );
+  "Update reference in addition" >:: (fun _ ->
+      "(set 2; get) * (set 3; get)" 
+      |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 6)
+    );
+  "Function reference" >:: (fun _ ->
+      "(set fun x -> x); get 4"
+      |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 4)
+    )
 ]
 
 let suite = "LML tests" >::: List.concat [

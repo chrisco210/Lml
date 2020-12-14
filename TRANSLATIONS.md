@@ -36,4 +36,12 @@
 
 [[e1; e2]] =
   L k . L m . [[e1]] (L k' . L m' . [[e2]] k m') m
+
+[[while e1 do e2 done]] =
+  L k . L m . 
+    Z (L f . L m'. 
+      [[e1]] 
+      (L b . L m'' . if b then [[e2]] f m'' else k () m'') 
+      m'
+    ) m
 ```
