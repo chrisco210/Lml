@@ -9,5 +9,5 @@ let isPrime = fun n ->
     done;
 ~get#0 
 in 
-isPrime 5
+isPrime 13
 (* Should output true *)

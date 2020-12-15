@@ -2,7 +2,6 @@ open Lambdaast
 open Iast
 
 
-
 let counter = ref 0
 (** [free_var] generates a fresh variable that has not been used before.  
     It will never match a user defined variable because it includes characters
