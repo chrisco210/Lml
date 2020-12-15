@@ -5,6 +5,7 @@ type bop =
   | Plus 
   | Minus
   | Times
+  | Div
   | Equals
   | Lteq
   | Lt

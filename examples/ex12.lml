@@ -1,0 +1,13 @@
+(* A simple example using while loops.  It is kind of slow, so dont try too
+   large numbers. *)
+let isPrime = fun n -> 
+  if n = 1 then false else
+    let isDivBy = fun a b -> (a / b) * b = a in 
+    set (false, n - 1);
+    while (get#1) > 1 do 
+      set (get#0 || (isDivBy n (get#1)), get#1 - 1)
+    done;
+~get#0 
+in 
+isPrime 5
+(* Should output true *)

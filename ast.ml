@@ -44,6 +44,7 @@ and  bop =
   | Plus 
   | Minus
   | Times
+  | Div
   | Equals
   | Lteq
   | Lt
@@ -108,3 +109,4 @@ and string_of_bop (b : bop) : string =
   | Cons -> "::"
   | And -> "&&"
   | Or -> "||"
+  | Div -> "/"

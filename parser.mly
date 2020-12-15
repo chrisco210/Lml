@@ -51,6 +51,7 @@ open Ast
 %token MINUS
 %token EQUALS
 %token NEQ
+%token DIV
 
 %token NOT
 %token NEG
@@ -88,6 +89,7 @@ open Ast
 %left LT
 %left NEQ
 %left EQUALS
+%left DIV
 %left PLUS
 %left MINUS
 %left TIMES
@@ -120,6 +122,7 @@ open Ast
   | AND { And }
   | OR { Or }
   | CONS { Cons }
+  | DIV { Div }
   ;
 %inline uop:
   | NOT { Not }

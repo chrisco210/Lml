@@ -30,6 +30,7 @@ let lambop_of_bop (b : Ast.bop) : Lambdaast.bop =
   | Gteq -> Gteq
   | Gt -> Gt
   | Neq -> Neq
+  | Div -> Div
 
 let lambop_of_uop (u : Ast.uop) : Lambdaast.uop =
   match u with

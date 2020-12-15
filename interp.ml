@@ -88,6 +88,7 @@ let rec eval (exp : lamcom) : lamcom =
       | Gteq -> Bool (l' >= r')
       | Gt -> Bool (l' > r')
       | Neq -> Bool (l' <> r')
+      | Div -> Int (l' / r')
     end 
   | Uop (op, e) ->
     begin 

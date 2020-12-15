@@ -32,6 +32,7 @@ rule read =
   | "*" { TIMES }
   | "-" { MINUS }
   | "+" { PLUS }
+  | "/" {DIV}
   | "(" { LPAREN }
   | ")" { RPAREN }
   | "=" { EQUALS }
