@@ -375,6 +375,14 @@ let exec_tests = [
       "set 1; 2 * get" 
       |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 2)
     );
+  "Negation converted properly" >:: (fun _ ->
+      "~false" 
+      |> parse |> convert |> eval |> assert_equal (Lambdaast.Bool true)
+    );
+  "Negation converted properly" >:: (fun _ ->
+      "~true" 
+      |> parse |> convert |> eval |> assert_equal (Lambdaast.Bool false)
+    );
   "Update reference in addition" >:: (fun _ ->
       "(set 2; get) * (set 3; get)" 
       |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 6)
@@ -388,7 +396,7 @@ let exec_tests = [
       |> assert_equal (Lambdaast.Int 1)
     );
   "Recursion with references" >:: (fun _ ->
-      "(set (L x . x));
+      "(set (fun x -> x));
       let fact = fun n -> if n = 0 then 1 else n * (get (n - 1)) in 
       (set (fact)); 
       fact 5" 

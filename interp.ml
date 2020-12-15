@@ -3,6 +3,19 @@ open Pprint
 
 (* This interpreter uses de bruijn notation as it is easier *)
 
+let eval_bop (b : bop) (l : int) (r : int) : lamcom =
+  match b with 
+  | Plus -> Int (l + r)
+  | Minus -> Int (l - r)
+  | Times -> Int (l * r)
+  | Equals -> Bool (l = r)
+  | Lteq -> Bool (l <= r)
+  | Lt -> Bool (l < r)
+  | Gteq -> Bool (l >= r)
+  | Gt -> Bool (l > r)
+  | Neq -> Bool (l <> r)
+  | Div -> Int (l / r)
+
 (** [shift i c e] Implements the raising function for handling free variables 
     de Bruijn LC
 *)
@@ -73,30 +86,10 @@ let rec eval (exp : lamcom) : lamcom =
       | Int n -> n 
       | _ -> failwith ("Binary operators must take integers on rhs: " ^ string_of_exp (Bop (op, l, r)))
     in 
-    begin
-      match op with 
-      | Plus -> Int (l' + r')
-      | Minus -> Int (l' - r')
-      | Times -> Int (l' * r')
-      | Equals -> Bool (l' = r')
-      | Lteq -> Bool (l' <= r')
-      | Lt -> Bool (l' < r')
-      | Gteq -> Bool (l' >= r')
-      | Gt -> Bool (l' > r')
-      | Neq -> Bool (l' <> r')
-      | Div -> Int (l' / r')
-    end 
-  | Uop (op, e) ->
+    eval_bop op l' r'
+  | Uop (Neg, e) ->
     begin 
-      match op with
-      | Not -> begin
-          match eval e with
-          | Bool b -> Bool (Bool.not b)
-          | _ -> failwith ("Not must take a boolean: " ^ string_of_exp (Uop (op, e)))
-        end
-      | Neg -> begin
-          match eval e with
-          | Int n -> Int (-n)
-          | _ -> failwith ("Neg must take an integer: " ^ string_of_exp (Uop (op, e)))
-        end
+      match eval e with
+      | Int n -> Int (-n)
+      | _ -> failwith ("Neg must take an integer: " ^ string_of_exp (Uop (Neg, e)))
     end

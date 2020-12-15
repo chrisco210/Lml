@@ -13,7 +13,6 @@ type bop =
   | Gt
   | Neq
 type uop =
-  | Not
   | Neg
 
 type var = int

@@ -34,10 +34,10 @@ let lambop_of_bop (b : Ast.bop) : Lambdaast.bop =
 
 let lambop_of_uop (u : Ast.uop) : Lambdaast.uop =
   match u with
-  | Not -> Not
   | Neg -> Neg
   | Hd -> failwith "Hd cannot be converted directly"
   | Tl -> failwith "Tl cannot be converted directly"
+  | Not -> failwith "Not cannot be converted directly"
 
 (** [convert e] is a lambda calculus translation of an expression e*)
 let rec convert_var (e : expr) : iast = 
@@ -74,6 +74,7 @@ let rec convert_var (e : expr) : iast =
       match u with
       | Hd -> App (fst, App (snd, convert_var e'))
       | Tl -> App (snd, App (snd, convert_var e'))
+      | Not -> If(convert_var e', Bool false, Bool true)
       | _ -> Uop (lambop_of_uop u, convert_var e')
     end
   | Letg(v,e') -> failwith "unimplemented"
