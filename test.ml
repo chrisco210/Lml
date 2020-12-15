@@ -291,8 +291,8 @@ let exec_tests = [
       "let rec fact = fun n -> if n = 0 then 1 else n * fact (n - 1) in fact 4"
       |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 24)
     );
-  (* This test is disabled because it takes forever
-     "Complex recursive function" >:: (fun _ -> 
+
+  "Complex recursive function" >:: (fun _ -> 
       "
       let rec mod = fun a b -> 
         if a < b then a else
@@ -306,7 +306,7 @@ let exec_tests = [
         in
       gcd 55 10
      " |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 5)
-     ); *)
+    ); 
   "Projection works correctly" >:: (fun _ ->
       "(1,2)#0" |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 1)
     );
@@ -406,11 +406,37 @@ let exec_tests = [
   "Basic while loop" >:: (fun _ ->
       "while get < 10 do set (get + 1) done; get"
       |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 10)
-    )
+    );
+  "ex12 Test case" >:: (fun _ ->
+      "let isPrime = fun n -> 
+      if n = 1 then false else
+      let isDivBy = fun a b -> (a / b) * b = a in 
+      set (false, n - 1);
+      while (get#1) > 1 do 
+        set (get#0 || (isDivBy n (get#1)), get#1 - 1)
+      done;
+      ~get#0 
+      in 
+      isPrime 13"
+      |> parse |> convert |> eval |> assert_equal (Lambdaast.Bool true)
+    );
+  "ex12 Test case" >:: (fun _ ->
+      "let isPrime = fun n -> 
+      if n = 1 then false else
+      let isDivBy = fun a b -> (a / b) * b = a in 
+      set (false, n - 1);
+      while (get#1) > 1 do 
+        set (get#0 || (isDivBy n (get#1)), get#1 - 1)
+      done;
+      ~get#0 
+      in 
+      isPrime 49"
+      |> parse |> convert |> eval |> assert_equal (Lambdaast.Bool false)
+    );
 ]
 
 let suite = "LML tests" >::: List.concat [
-    lc_interpret_tests; 
+    (* lc_interpret_tests;  *)
     parse_tests; 
     exec_tests
   ]

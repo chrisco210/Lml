@@ -1,5 +1,4 @@
-(* A simple example using while loops.  It is kind of slow, so dont try too
-   large numbers. *)
+(* A simple example using while loops. *)
 let isPrime = fun n -> 
   if n = 1 then false else
     let isDivBy = fun a b -> (a / b) * b = a in 
