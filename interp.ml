@@ -35,19 +35,15 @@ let rec sub (e1 : lamcom) (e2 : lamcom) (m : var) : lamcom =
   | Pair (e, e') -> Pair(sub e e2 m, sub e' e2 m)
   | Proj (n, e') -> Proj(n, sub e' e2 m)
 
-
-let is_val (exp : lamcom) : bool =
-  match exp with 
-  | App _ | If _ | Bop _ -> false
-  | _ -> true
-
 (* For now, lets just do call by value, using big step evaluation *)
 let rec eval (exp : lamcom) : lamcom = 
   match exp with
-  (* Beta rule *)
-  | App (Lam e1, e2) -> shift ~-1 0 (eval (sub e1 (shift 1 0 e2) 0))
   (* Eval on left *)
-  | App (e1, e2) -> let e1' = eval e1 in eval (App (e1', e2))
+  | App (e1, e2) -> let e1' = eval e1 in begin 
+      match e1' with 
+      | Lam e3 -> shift ~-1 0 (eval (sub e3 (shift 1 0 e2) 0))
+      | _ -> failwith "Cannot apply to a non function."
+    end
   (* Values step to themselves *)
   | Var n -> Var n
   | Int n -> Int n
