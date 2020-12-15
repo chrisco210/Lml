@@ -257,7 +257,10 @@ let rec convert_cps_init (e : iast) : iast =
                                                   convert_cps_init e2,
                                                   Lam (k''',
                                                        Lam (m''',
-                                                            App (Var f, Var m''')
+                                                            App (
+                                                              Var f, 
+                                                              Var m'''
+                                                            )
                                                            )
                                                       )
                                                 ),

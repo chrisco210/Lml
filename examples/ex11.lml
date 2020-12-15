@@ -1,7 +1,7 @@
 (* Using mutability, we can have recursive functions without rec! *)
 (* Note: taken from the 3110 wiki *)
-(set (L x . x));
+set (L x . x);
 let fact = fun n -> if n = 0 then 1 else n * (get (n - 1)) in 
-(set (fact)); 
+set (fact); 
 fact 5
 (* Should output 120 *)
