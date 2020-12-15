@@ -251,7 +251,15 @@ let parse_tests = [
   make_parse_test "1 + 1; 2; 3" (Seq (Seq (Bop (Int 1, Plus, Int 1), Int 2), Int 3));
   make_parse_test "while true do 1 done" (While (Bool true, Int 1));
   make_parse_test "while false do 1 done; 2" (Seq (While (Bool false, Int 1), Int 2));
-  make_parse_test "while false do 1; 2 done; 1" (Seq (While (Bool false, Seq (Int 1, Int 2)), Int 1))
+  make_parse_test "while false do 1; 2 done; 1" (Seq (While (Bool false, Seq (Int 1, Int 2)), Int 1));
+  make_parse_test "while get < 10 do set (get + 1) done; get" 
+    (Seq (
+        While (
+          (Bop (Get, Lt, Int 10)),
+          Set (Bop (Get, Plus, Int 1))
+        ), Get
+      )
+    )
 ]
 (* Conversion and execution tests *)
 open Convert
@@ -373,6 +381,21 @@ let exec_tests = [
   "Function reference" >:: (fun _ ->
       "(set fun x -> x); get 4"
       |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 4)
+    );
+  "Updating reference inside of if" >:: (fun _ -> 
+      "if set 1; true then get else 0" |> parse |> convert |> eval 
+      |> assert_equal (Lambdaast.Int 1)
+    );
+  "Recursion with references" >:: (fun _ ->
+      "(set (L x . x));
+      let fact = fun n -> if n = 0 then 1 else n * (get (n - 1)) in 
+      (set (fact)); 
+      fact 5" 
+      |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 120)
+    );
+  "Basic while loop" >:: (fun _ ->
+      "while get < 10 do set (get + 1) done; get"
+      |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 10)
     )
 ]
 

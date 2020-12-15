@@ -234,44 +234,48 @@ let rec convert_cps_init (e : iast) : iast =
     let m = free_var () in 
     let f = free_var () in 
     let m' = free_var () in 
-    let b = free_var () in 
+    let k'' = free_var () in 
     let m'' = free_var () in 
+    let k''' = free_var () in 
+    let m''' = free_var () in 
     Lam (k,
          Lam (m,
               App (
                 App (
                   zcomb,
-                  (Lam (f, 
-                        Lam (m', 
-                             App (
-                               App (
-                                 (convert_cps_init e1),
-                                 (Lam (b,
-                                       Lam (m'',
-                                            If(
-                                              Var b,
-                                              (App(
-                                                  App(
-                                                    convert_cps_init e2,
-                                                    Var f
-                                                  ),
-                                                  Var m''
-                                                )),
-                                              App (
+                  Lam (f,
+                       Lam (m',
+                            App(
+                              App (
+                                convert_cps_init e1,
+                                Lam (k'',
+                                     Lam (m'',
+                                          If (
+                                            (Var k''),
+                                            (App (
                                                 App (
-                                                  Var k,
-                                                  Unit
+                                                  convert_cps_init e2,
+                                                  Lam (k''',
+                                                       Lam (m''',
+                                                            App (Var f, Var m''')
+                                                           )
+                                                      )
                                                 ),
                                                 Var m''
                                               )
+                                            ),
+                                            App (
+                                              App (Var k, Unit),
+                                              Var m''
                                             )
-                                           )
-                                      ))
-                               ),
-                               Var m'
-                             )
+                                          )
+                                         )
+                                    )
+                              ),
+                              Var m'
                             )
-                       ))
+                           )
+                      )
                 ),
                 Var m
               )
