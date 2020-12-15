@@ -8,11 +8,12 @@ let id_fun : lamcom = Lam (Var 0)
 
 (* Y ≜ 𝜆 𝑓 . (𝜆𝑥. 𝑓 (𝑥 𝑥)) (𝜆𝑥. 𝑓 (𝑥 𝑥)). *)
 (* 𝐺 ≜ 𝜆 𝑓 . 𝜆𝑛. if 𝑛 = 0 then 1 else 𝑛 × (𝑓 (𝑛 − 1)) *)
-(* We use the Y combinator because we implemented call by name semantics *)
-let ycomb : lamcom = Lam (
+(* Z = 𝜆 𝑓 . (𝜆𝑥. 𝑓 (𝜆𝑦. 𝑥 𝑥 𝑦)) (𝜆𝑥. 𝑓 (𝜆𝑦. 𝑥 𝑥 𝑦)) *)
+(* We use the Z combinator because we implemented call by name semantics *)
+let comb : lamcom = Lam (
     App (
-      (Lam (App (Var 1, App (Var 0, Var 0)))), 
-      (Lam (App (Var 1, App (Var 0, Var 0))))
+      (Lam (App (Var 1, App (App (Var 1, Var 1), Var 0)))),
+      (Lam (App (Var 1, App (App (Var 1, Var 1), Var 0))))
     )
   )
 
@@ -38,7 +39,7 @@ let fact' : lamcom  = Lam (
     )
   )
 
-let fact : lamcom = App (ycomb, fact')
+let fact : lamcom = App (comb, fact')
 
 (* The fixed point of this raises a base to an exponent  *)
 let pow' : lamcom = 
@@ -73,7 +74,7 @@ let pow' : lamcom =
     )
   )
 
-let pow : lamcom = App (ycomb, pow')
+let pow : lamcom = App (comb, pow')
 
 (* Nested function *)
 let nested : lamcom = App (Lam (Lam (Var 1)), Int 4)
@@ -174,19 +175,19 @@ let lc_interpret_tests = [
   "Church addition" >:: (fun _ -> 
       App (App (church_add, church 55), church 33) |> eval |> church_to_int |> assert_equal (55 + 33)
     );
-  "Pair test" >:: (fun _ ->
+  (* "Pair test" >:: (fun _ ->
       Pair (Int 1, Int 2) |> eval |> assert_equal (Pair (Int 1, Int 2))
-    );
-  "Evaluating a pair" >:: (fun _ ->
+     );
+     "Evaluating a pair" >:: (fun _ ->
       (App (Lam (Pair (Var 0, Var 0)), Int 1)) |> eval 
       |> assert_equal (Pair (Int 1, Int 1))
-    );
-  "Evaluating within a pair" >:: (fun _ ->
+     );
+     "Evaluating within a pair" >:: (fun _ ->
       Pair (
         (App ((Lam (Var 0)), (Int 2))),
         ((App ((App ((Lam (Lam (Bop (Plus,  Var 0, Var 1)))), (Int 2))), (Int 4))))
       ) |> eval |> assert_equal (Pair (Int 2, Int 6))
-    )
+     ) *)
 ]
 
 

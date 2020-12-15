@@ -44,5 +44,10 @@ module Make (C : Converter) : Repl = struct
     end;
     eval_and_loop ()
 
-  let repl () = eval_and_loop ()
+  let repl () = 
+    print_endline "--------------------------------------------------------------------------------";
+    print_endline "                                    LML REPL                                    ";
+    print_endline "--------------------------------------------------------------------------------";
+    print_endline "Press ^C to quit, see README.md for syntax help and some examples to run";
+    eval_and_loop ()
 end
