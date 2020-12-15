@@ -1,7 +1,8 @@
-(* This is the module for an ast of Lml *)
+(** [ast] is a module with types representing the AST of LML*)
 
 type var = string
 
+(** [expr] an LML expression*)
 type expr = 
   (* Regular functional stuff *)
   | Let of var * expr * expr
@@ -40,6 +41,7 @@ type expr =
   | Int of int
   | Bool of bool
   | Unit
+  (** Binary operators*)
 and  bop = 
   | Plus 
   | Minus
@@ -54,6 +56,7 @@ and  bop =
   | And
   | Or
   | Cons
+  (** Unary Operators*)
 and uop =
   | Not
   | Neg 
