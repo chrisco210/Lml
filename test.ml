@@ -210,7 +210,10 @@ let parse_tests = [
   make_parse_test "a := ref 0" (Assign (Var "a", Ref (Int 0)));
   make_parse_test "!a" (Deref (Var "a"));
   make_parse_test "let x = ref 10 in x := 11; !x" (Let ("x", (Ref (Int 10)), Seq (Assign (Var "x", Int 11), (Deref (Var "x")))));
+  make_parse_test "let x = ref (L x . x) in !x 5" (Let ("x", (Ref (Abs ("x", (Var "x")))), App (Deref (Var "x"), Int 5)));
+  make_parse_test "!!x" (Deref (Deref (Var "x")));
 ]
+
 (* Conversion and execution tests *)
 open Convert
 let zcombstr = "L f . (L x . f (L y . x x y)) (L x . f (L y . x x y))"
@@ -415,9 +418,17 @@ let exec_tests = [
       "let x = ref 10 in x := 11; !x" 
       |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 11)
     );
-  "Double refs" >:: (fun _ ->
+  "Double ref" >:: (fun _ ->
+      "let x = ref (ref 10) in !!x"
+      |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 10)
+    );
+  "Double refs update" >:: (fun _ ->
       "let x = ref (ref 10) in let y = ref (ref 20) in x := y; !!x" 
       |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 20)
+    );
+  "Multiple refs" >:: (fun _ ->
+      "let x = ref 10 in let y = ref 20 in !y + !x" 
+      |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 30)
     )
 ]
 

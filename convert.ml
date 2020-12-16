@@ -139,28 +139,28 @@ let rec convert_var (e : expr) : iast =
   | Assign(e1,e2) -> convert_var (
       Set (
         Tuple 
-          [(Proj (Get, 1));
-           Letrec ("**/f", ["**/n"; "**/lst"],
-                   If (
-                     IsNil (Var "**/lst"),
-                     Nil,
-                     If (
-                       Bop (Var "**/n", Equals, Uop (Hd, Var "**/lst")),
-                       Bop (
-                         Tuple [Var "**/n"; e2],
-                         Cons,
-                         App (App (Var "**/f", Var "**/n"), Uop (Tl, Var "**/lst"))
-                       ),
-                       Bop (
-                         Uop (Hd, Var "**/lst"),
-                         Cons,
-                         App (App (Var "**/f", Var "**/n"), (Uop (Tl, Var "**/lst")))
-                       )
-                     )
-
-                   ),
-                   App (App (Var "**/f", e1), Proj (Get, 2))
-                  )
+          [
+            (Proj (Get, 1));
+            Letrec ("**//f", ["**//n"; "**//lst"],
+                    If (
+                      IsNil (Var "**//lst"),
+                      Nil,
+                      If (
+                        Bop (Var "**//n", Equals, Proj (Uop (Hd, Var "**//lst"), 1)),
+                        Bop (
+                          Tuple [Var "**//n"; e2],
+                          Cons,
+                          App (App (Var "**//f", Var "**//n"), Uop (Tl, Var "**//lst"))
+                        ),
+                        Bop (
+                          Uop (Hd, Var "**//lst"),
+                          Cons,
+                          App (App (Var "**//f", Var "**//n"), (Uop (Tl, Var "**//lst")))
+                        )
+                      )
+                    ),
+                    App (App (Var "**//f", e1), Proj (Get, 2))
+                   )
           ]
       )
     )
