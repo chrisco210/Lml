@@ -204,14 +204,7 @@ let parse_tests = [
   make_parse_test "while true do 1 done" (While (Bool true, Int 1));
   make_parse_test "while false do 1 done; 2" (Seq (While (Bool false, Int 1), Int 2));
   make_parse_test "while false do 1; 2 done; 1" (Seq (While (Bool false, Seq (Int 1, Int 2)), Int 1));
-  make_parse_test "while get < 10 do set (get + 1) done; get" 
-    (Seq (
-        While (
-          (Bop (Get, Lt, Int 10)),
-          Set (Bop (Get, Plus, Int 1))
-        ), Get
-      )
-    )
+  make_parse_test "while get < 10 do set (get + 1) done; get" (Seq (While ((Bop (Get, Lt, Int 10)),Set (Bop (Get, Plus, Int 1))), Get));
 ]
 (* Conversion and execution tests *)
 open Convert
@@ -259,27 +252,27 @@ let exec_tests = [
      " |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 5)
     ); 
   "Projection works correctly" >:: (fun _ ->
-      "(1,2)#0" |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 1)
+      "(1,2)#1" |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 1)
     );
   "Projection works correctly" >:: (fun _ ->
-      "(1,2)#1" |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 2)
+      "(1,2)#2" |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 2)
     );
   "Projection and application are applied correctly" >:: (fun _ ->
-      "(fun x -> x + 1, fun x -> x + 2)#0 1" 
+      "(fun x -> x + 1, fun x -> x + 2)#1 1" 
       |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 2)
     );
   "Nested tuples are projected correctly" >:: (fun _ -> 
-      "(1, (2, 3))#1#1" 
+      "(1, (2, 3))#2#2" 
       |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 3)
     );
   "More nested tuples" >:: (fun _ ->
-      "let a = ((1, 2),(3,4)) in a#0#0 + a#0#1 + a#1#0 + a#1#1"
+      "let a = ((1, 2),(3,4)) in a#1#1 + a#1#2 + a#2#1 + a#2#2"
       |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 10)
     );
   "Curried function test" >:: (fun _ -> 
       "let curry = 
       fun f -> 
-      fun tpl -> f tpl#0 tpl#1
+      fun tpl -> f tpl#1 tpl#2
       in
       let add = fun a b -> a + b
       in 
@@ -363,10 +356,10 @@ let exec_tests = [
       if n = 1 then false else
       let isDivBy = fun a b -> (a / b) * b = a in 
       set (false, n - 1);
-      while (get#1) > 1 do 
-        set (get#0 || (isDivBy n (get#1)), get#1 - 1)
+      while (get#2) > 1 do 
+        set (get#1 || (isDivBy n (get#2)), get#2 - 1)
       done;
-      ~get#0 
+      ~get#1 
       in 
       isPrime 13"
       |> parse |> convert |> eval |> assert_equal (Lambdaast.Bool true)
@@ -376,10 +369,10 @@ let exec_tests = [
       if n = 1 then false else
       let isDivBy = fun a b -> (a / b) * b = a in 
       set (false, n - 1);
-      while (get#1) > 1 do 
-        set (get#0 || (isDivBy n (get#1)), get#1 - 1)
+      while (get#2) > 1 do 
+        set (get#1 || (isDivBy n (get#2)), get#2 - 1)
       done;
-      ~get#0 
+      ~get#1
       in 
       isPrime 49"
       |> parse |> convert |> eval |> assert_equal (Lambdaast.Bool false)
@@ -395,6 +388,12 @@ let exec_tests = [
       "let rec pow = fun b e -> if e = 0 then 1 else b * (pow b (e - 1)) in 
       pow 2 8" 
       |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 256)
+    );
+  "Recursive adding function" >:: (fun _ ->
+      "let rec addtwo = fun a b -> 
+      if a = 0 then b else addtwo (a - 1) (b + a) 
+      in addtwo 5 0"
+      |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 15)
     )
 ]
 

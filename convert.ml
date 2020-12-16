@@ -84,8 +84,8 @@ let rec convert_var (e : expr) : iast =
     App (App (pair,  (convert_var e1)), convert_var e2)
   | Proj(e',n) -> let rec proj_rec (en : iast) (n : int) : iast =  
                     match n with
-                    | 0 -> (App (fst, en))
-                    | 1 -> (App (snd, en))
+                    | 1 -> (App (fst, en))
+                    | 2 -> (App (snd, en))
                     | _ -> failwith "n-ary tuples are not implemented"
     in proj_rec (convert_var e') n
   | Seq(e1,e2) -> Seq(convert_var e1, convert_var e2)

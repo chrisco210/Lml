@@ -1,7 +1,7 @@
 (* An example of using tuples in a function *)
 let curry = 
   fun f -> 
-  fun tpl -> f tpl#0 tpl#1
+  fun tpl -> f tpl#1 tpl#2
 in
 let add = fun a b -> a + b
 in 

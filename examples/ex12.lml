@@ -3,10 +3,10 @@ let isPrime = fun n ->
   if n = 1 then false else
     let isDivBy = fun a b -> (a / b) * b = a in 
     set (false, n - 1);
-    while (get#1) > 1 do 
-      set (get#0 || (isDivBy n (get#1)), get#1 - 1)
+    while (get#2) > 1 do 
+      set (get#1 || (isDivBy n (get#2)), get#2 - 1)
     done;
-~get#0 
+~get#1 
 in 
 isPrime 13
 (* Should output true *)
