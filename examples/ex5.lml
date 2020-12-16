@@ -1,3 +1,4 @@
-(*Functions are values and can be an output.  Evaluates to L . $0, in CPS form*)
+(* Functions are values and can be an output.  Evaluates to L . $0, in 
+   translated form *)
 let x = fun a -> a in
 x

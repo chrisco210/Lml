@@ -121,9 +121,6 @@ let lc_interpret_tests = [
   "Identity function applied" >:: (fun _ -> 
       (App (id_fun, Int 5)) |> eval |> assert_equal (Int 5)
     );
-  "Identity function applied to variable" >:: (fun _ ->
-      (App (id_fun, Var 0)) |> eval |> assert_equal (Var 0)
-    );
   "Nested lambdas applied give function that returns 4" >:: (fun _ -> 
       (nested |> eval |> assert_equal (Lam (Int 4)))
     );
@@ -142,52 +139,6 @@ let lc_interpret_tests = [
       |> eval 
       |> assert_equal (Int 8)
     );
-  "Application of y combinator based function" >:: (fun _ -> 
-      App (fact, (Int 4)) |> eval |> assert_equal (Int 24)
-    );
-  "Application of y combinator based function" >:: (fun _ -> 
-      App (fact, (Int 0)) |> eval |> assert_equal (Int 1)
-    );
-  "Application of y combinator based function" >:: (fun _ -> 
-      App (fact, (Int 8)) |> eval |> assert_equal (Int 40320)
-    );
-  "Two variable y combinator function" >:: (fun _ ->
-      App (App (pow, Int 10), Int 3) |> eval |> assert_equal (Int 1000)
-    );
-  "Encoded booleans application example" >:: (fun _ -> 
-      App (App (enc_or, enc_true), enc_false) |> eval |> assert_equal (enc_true)
-    );
-  "Encoded booleans application example" >:: (fun _ -> 
-      App (App (enc_or, enc_true), enc_true) |> eval |> assert_equal (enc_true)
-    );
-  "Encoded booleans application example" >:: (fun _ -> 
-      App (App (enc_and, App (App (enc_or, enc_true), enc_true)), enc_false) |> eval |> assert_equal (enc_false)
-    );
-  "Encoded booleans application example" >:: (fun _ -> 
-      App (enc_not, App (App (enc_and, App (App (enc_or, enc_true), enc_true)), enc_false)) |> eval |> assert_equal (enc_true)
-    );
-  "Church addition" >:: (fun _ -> 
-      App (App (church_add, church 3), church 2) |> eval |> church_to_int |> assert_equal 5
-    );
-  "Church addition" >:: (fun _ -> 
-      App (App (church_add, church 3), church 0) |> eval |> church_to_int |> assert_equal 3
-    );
-  "Church addition" >:: (fun _ -> 
-      App (App (church_add, church 55), church 33) |> eval |> church_to_int |> assert_equal (55 + 33)
-    );
-  (* "Pair test" >:: (fun _ ->
-      Pair (Int 1, Int 2) |> eval |> assert_equal (Pair (Int 1, Int 2))
-     );
-     "Evaluating a pair" >:: (fun _ ->
-      (App (Lam (Pair (Var 0, Var 0)), Int 1)) |> eval 
-      |> assert_equal (Pair (Int 1, Int 1))
-     );
-     "Evaluating within a pair" >:: (fun _ ->
-      Pair (
-        (App ((Lam (Var 0)), (Int 2))),
-        ((App ((App ((Lam (Lam (Bop (Plus,  Var 0, Var 1)))), (Int 2))), (Int 4))))
-      ) |> eval |> assert_equal (Pair (Int 2, Int 6))
-     ) *)
 ]
 
 
@@ -407,7 +358,7 @@ let exec_tests = [
       "while get < 10 do set (get + 1) done; get"
       |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 10)
     );
-  "ex12 Test case" >:: (fun _ ->
+  "ex12 based Test case" >:: (fun _ ->
       "let isPrime = fun n -> 
       if n = 1 then false else
       let isDivBy = fun a b -> (a / b) * b = a in 
@@ -420,7 +371,7 @@ let exec_tests = [
       isPrime 13"
       |> parse |> convert |> eval |> assert_equal (Lambdaast.Bool true)
     );
-  "ex12 Test case" >:: (fun _ ->
+  "ex12 based Test case" >:: (fun _ ->
       "let isPrime = fun n -> 
       if n = 1 then false else
       let isDivBy = fun a b -> (a / b) * b = a in 
@@ -433,10 +384,22 @@ let exec_tests = [
       isPrime 49"
       |> parse |> convert |> eval |> assert_equal (Lambdaast.Bool false)
     );
+  "ex1 test" >:: (fun _ ->
+      "let Z = L f . (L x . f (L y . x x y)) (L x . f (L y . x x y)) in
+      let G = L f . L n . if n = 0 then 1 else n * (f (n - 1)) in
+      let factorial = Z G in
+      factorial 4"
+      |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 24)
+    );
+  "Recursive power function" >:: (fun _->
+      "let rec pow = fun b e -> if e = 0 then 1 else b * (pow b (e - 1)) in 
+      pow 2 8" 
+      |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 256)
+    )
 ]
 
 let suite = "LML tests" >::: List.concat [
-    (* lc_interpret_tests;  *)
+    lc_interpret_tests; 
     parse_tests; 
     exec_tests
   ]

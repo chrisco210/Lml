@@ -1,5 +1,10 @@
 BENCHMARKS OF EVALUATORS using time, real time
+time ./main.byte examples/ex12.lml
 Run ex12, isPrime 13.
 ================================================================================
 CBN:
 8.306 7.837 7.761 7.945 7.903
+Environment model interpreter:
+.018 .009 .018 .019 .024
+
+Clearly it is much much faster, approximately 500 times faster.
