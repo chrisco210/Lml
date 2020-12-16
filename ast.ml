@@ -9,7 +9,7 @@ type expr =
   | Letrec of var * (var list) * expr * expr
   | Letg of var * expr
   | If of expr * expr * expr
-  | Tuple of expr * expr
+  | Tuple of expr list
   | Fun of (var list) * expr
   | Proj of expr * int
 
@@ -76,7 +76,7 @@ let rec string_of_ast (e : expr) : string =
   | Let (v, e1, e2) -> "(let " ^ v ^ " = " ^ (string_of_ast e1) ^ " in " ^ (string_of_ast e2) ^ ")"
   | If (e1, e2, e3) -> "if (" ^ (string_of_ast e1) ^ ") then (" ^ (string_of_ast e2) ^ ") else (" ^ (string_of_ast e3) ^ ")"
   | Fun (v, e) -> "fun" ^ (List.fold_left (fun a b ->  a ^ " " ^ b) "" v) ^ " -> (" ^ (string_of_ast e) ^ ")"
-  | Tuple (e1, e2) -> "(" ^ (string_of_ast e1) ^ ", " ^ (string_of_ast e2) ^ ")"
+  | Tuple (es) -> "(" ^ (List.fold_left (fun a b ->  a ^ "," ^ (string_of_ast b)) "" es) ^ ")"
   | Proj (e, n) -> (string_of_ast e) ^ "#" ^ (string_of_int n)
   | Seq (e1, e2) -> (string_of_ast e1) ^ "; " ^ (string_of_ast e2)
   | Uop (uop, e) -> (string_of_uop uop) ^ (string_of_ast e)

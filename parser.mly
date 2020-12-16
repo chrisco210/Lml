@@ -162,8 +162,13 @@ expr:
   | u = uop e = expr {Uop (u,e)}
   | e1 = expr POUND n = INT { Proj(e1, n) }
   | LPAREN e=expr RPAREN {e}
-  | LPAREN e1 = expr COMMA e2 = expr RPAREN {Tuple (e1, e2)}
+  | LPAREN e = tuple_args RPAREN {Tuple e}
   ;
 fun_args:
   | v1 = ID { [v1] }
   | h = ID t = fun_args { h::t }
+  ;
+tuple_args:
+  | v1 = expr COMMA v2 = expr { [v1; v2] }
+  | h = expr COMMA t = tuple_args { h::t }
+  ;

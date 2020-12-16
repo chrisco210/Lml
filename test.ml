@@ -189,11 +189,13 @@ let parse_tests = [
   make_parse_test "(* comment *) L x . x" (Abs ("x", Var "x"));
   make_parse_test "(* comment *) L x . (*more comments *)x" (Abs ("x", Var "x"));
   make_parse_test "(* cool (*nested (*Comments*)*) *) L x . (*more comments *)x" (Abs ("x", Var "x")); 
-  make_parse_test "(a, b)" (Tuple (Var "a", Var "b"));
-  make_parse_test "(fun a -> a, fun b -> b)" (Tuple (Fun (["a"], Var "a"), Fun (["b"], Var "b")));
-  make_parse_test "let a = (1, 2) in add a" (Let ("a", Tuple (Int 1, Int 2), App (Var "add", Var "a")));
+  make_parse_test "(a, b)" (Tuple [Var "a"; Var "b"]);
+  make_parse_test "(fun a -> a, fun b -> b)" (Tuple [Fun (["a"], Var "a"); Fun (["b"], Var "b")]);
+  make_parse_test "(1, 2, 3)" (Tuple [Int 1; Int 2; Int 3]);
+  make_parse_test "(1, 2, 3, 4)" (Tuple [Int 1; Int 2; Int 3; Int 4]);
+  make_parse_test "let a = (1, 2) in add a" (Let ("a", Tuple [Int 1; Int 2], App (Var "add", Var "a")));
   make_parse_test "a b#0" (App (Var "a", Proj (Var "b", 0)));
-  make_parse_test "let x = (1, 2) in x # 0" (Let ("x", (Tuple (Int 1, Int 2)), Proj (Var "x", 0)));
+  make_parse_test "let x = (1, 2) in x # 0" (Let ("x", (Tuple [Int 1; Int 2]), Proj (Var "x", 0)));
   make_parse_test "fun a -> fun b -> b" (Fun (["a"], (Fun (["b"], Var "b"))));
   make_parse_test "1; 2" (Seq (Int 1, Int 2));
   make_parse_test "unit" Unit;
@@ -295,6 +297,9 @@ let exec_tests = [
   "is_nil is correct" >:: (fun _ ->
       "is_nil (1::[])" |> parse |> convert |> eval |> assert_equal (Lambdaast.Bool false)
     );
+  "is_nil of tl is correct" >:: (fun _ ->
+      "is_nil (tl (1::[]))" |> parse |> convert |> eval |> assert_equal (Lambdaast.Bool true)
+    );
   "Boolean and encodings" >:: (fun _ -> 
       "(if false && false then 1 else 0) 
       + 10 * (if false && true then 1 else 0)
@@ -394,7 +399,11 @@ let exec_tests = [
       if a = 0 then b else addtwo (a - 1) (b + a) 
       in addtwo 5 0"
       |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 15)
-    )
+    );
+  "Nary tuples basic test" >:: (fun _ -> 
+      "let x = (1,2,3,4) in x#4" 
+      |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 4)
+    ) 
 ]
 
 let suite = "LML tests" >::: List.concat [

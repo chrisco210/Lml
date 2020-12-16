@@ -52,7 +52,11 @@ let subst_env (env : env) (exp : lamcom) : lamcom =
       If (subst_env' env e1 r, subst_env' env e2 r, subst_env' env e3 r)
     | Bop (b, e1, e2) -> Bop (b, subst_env' env e1 r, subst_env' env e2 r)
     | Uop (u, e1) -> Uop (u, subst_env' env e1 r)
-    | Var v -> if v >= r then List.nth env (v - r) |> expr_of_value else Var v
+    | Var v -> if v >= r then 
+        match List.nth_opt env (v - r) with 
+        | Some r -> expr_of_value r 
+        | None -> Var v
+      else Var v
     | x -> x
   in
   match exp with 
