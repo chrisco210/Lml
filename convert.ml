@@ -32,6 +32,13 @@ let nth_triple n = Lam ("***p",
                         )
                        )
 
+let zcomb = Lam ("**f", 
+                 App (
+                   (Lam ("**x", App (Var "**f", Lam ("**y", App (App (Var "**x", Var "**x"), Var "**y"))))), 
+                   (Lam ("**x", App (Var "**f", Lam ("**y", App (App (Var "**x", Var "**x"), Var "**y"))))) 
+                 )
+                ) 
+
 (** [lambop_of_bop b] is the lambdaast version of a binary operator*)
 let lambop_of_bop (b : Ast.bop) : Lambdaast.bop = 
   match b with 
@@ -62,12 +69,6 @@ let rec convert_var (e : expr) : iast =
   | Let(v,e1,e2) -> (App (Lam (v, convert_var e2), convert_var e1)) 
   (* Uses the Z combinator for recursion *)
   | Letrec (v, va, e, b) -> 
-    let zcomb = Lam ("**f", 
-                     App (
-                       (Lam ("**x", App (Var "**f", Lam ("**y", App (App (Var "**x", Var "**x"), Var "**y"))))), 
-                       (Lam ("**x", App (Var "**f", Lam ("**y", App (App (Var "**x", Var "**x"), Var "**y"))))) 
-                     )
-                    ) in 
     let converted = convert_var (Abs (v, Fun (va, e)))  in 
     let convbody = convert_var (Abs (v, b))  in
     App (convbody, App (zcomb, converted))
@@ -111,10 +112,59 @@ let rec convert_var (e : expr) : iast =
                     | n -> proj_rec (App (nth_triple 3, prj)) (n - 2)
     in proj_rec (convert_var e') n
   | Seq(e1,e2) -> Seq(convert_var e1, convert_var e2)
-  | Ref(e') -> Ref (convert_var e')
-  | Deref (e') -> Deref (convert_var e')
+  | Ref(e') -> convert_var (Ast.Seq (
+      Set (Tuple [Bop (Proj (Get, 1), Plus, Int 1); Bop (Tuple [Proj (Get, 1); e'], Cons, (Proj (Get, 2)))]),
+      Bop (Proj (Get, 1), Minus, Int 1)
+    )
+    )
+  | Deref (e') -> convert_var (
+      Letrec (
+        "**/f", 
+        ["**/n"; "**/lst"], 
+        (If (
+            (IsNil (Var "**/lst")), 
+            Unit, 
+            (If (
+                (Bop (Var "**/n", Equals, Proj (Uop (Hd, Var "**/lst"), 1))), 
+                (Proj (Uop (Hd, Var "**/lst"), 2)),
+                (App (App (Var "**/f", Var "**/n"), (Uop (Tl, Var "**/lst"))))
+              )
+            )
+          )
+        )
+        ,
+        App (App (Var "**/f", e'), Proj (Get, 2))
+      )
+    )
+  | Assign(e1,e2) -> convert_var (
+      Set (
+        Tuple 
+          [(Proj (Get, 1));
+           Letrec ("**/f", ["**/n"; "**/lst"],
+                   If (
+                     IsNil (Var "**/lst"),
+                     Nil,
+                     If (
+                       Bop (Var "**/n", Equals, Uop (Hd, Var "**/lst")),
+                       Bop (
+                         Tuple [Var "**/n"; e2],
+                         Cons,
+                         App (App (Var "**/f", Var "**/n"), Uop (Tl, Var "**/lst"))
+                       ),
+                       Bop (
+                         Uop (Hd, Var "**/lst"),
+                         Cons,
+                         App (App (Var "**/f", Var "**/n"), (Uop (Tl, Var "**/lst")))
+                       )
+                     )
+
+                   ),
+                   App (App (Var "**/f", e1), Proj (Get, 2))
+                  )
+          ]
+      )
+    )
   | While(e1,e2) -> While (convert_var e1, convert_var e2)
-  | Assign(e1,e2) -> Assign (convert_var e1, convert_var e2)
   | Break -> Break
   | Continue -> Continue
   | Nil -> App (App (pair_list,  Bool true), Bool true)
@@ -124,5 +174,5 @@ let rec convert_var (e : expr) : iast =
   | Set (e) -> Set (convert_var e)
 
 let rec convert (e : expr) : lamcom = 
-  let translated = convert_var e |> convert_cps in 
+  let translated = convert_var (Seq (Set (Tuple [Int 0; Nil]), e)) |> convert_cps in 
   App (App (translated, Lam (Lam (Var 1))), Int 0)

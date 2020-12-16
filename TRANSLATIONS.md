@@ -48,4 +48,8 @@
       ) m'
   )
   m
+
+[[get]] = L k . L m . k m m
+
+[[set e]] = L k . L m . [[e]] (L k' . L m' . k () k') m
 ```

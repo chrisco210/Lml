@@ -207,6 +207,9 @@ let parse_tests = [
   make_parse_test "while false do 1 done; 2" (Seq (While (Bool false, Int 1), Int 2));
   make_parse_test "while false do 1; 2 done; 1" (Seq (While (Bool false, Seq (Int 1, Int 2)), Int 1));
   make_parse_test "while get < 10 do set (get + 1) done; get" (Seq (While ((Bop (Get, Lt, Int 10)),Set (Bop (Get, Plus, Int 1))), Get));
+  make_parse_test "a := ref 0" (Assign (Var "a", Ref (Int 0)));
+  make_parse_test "!a" (Deref (Var "a"));
+  make_parse_test "let x = ref 10 in x := 11; !x" (Let ("x", (Ref (Int 10)), Seq (Assign (Var "x", Int 11), (Deref (Var "x")))));
 ]
 (* Conversion and execution tests *)
 open Convert
@@ -353,7 +356,7 @@ let exec_tests = [
       |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 120)
     );
   "Basic while loop" >:: (fun _ ->
-      "while get < 10 do set (get + 1) done; get"
+      "set 0; while get < 10 do set (get + 1) done; get"
       |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 10)
     );
   "ex12 based Test case" >:: (fun _ ->
@@ -403,7 +406,19 @@ let exec_tests = [
   "Nary tuples basic test" >:: (fun _ -> 
       "let x = (1,2,3,4) in x#4" 
       |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 4)
-    ) 
+    );
+  "Simple reference test" >:: (fun _ ->
+      "let x = ref 10 in !x" 
+      |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 10)
+    );
+  "Simple updating ref test" >:: (fun _ ->
+      "let x = ref 10 in x := 11; !x" 
+      |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 11)
+    );
+  "Double refs" >:: (fun _ ->
+      "let x = ref (ref 10) in let y = ref (ref 20) in x := y; !!x" 
+      |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 20)
+    )
 ]
 
 let suite = "LML tests" >::: List.concat [

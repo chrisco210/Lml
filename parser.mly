@@ -77,9 +77,11 @@ open Ast
 
 %token EOF
 
-%nonassoc PERIOD ELSE IN ARROW COLONEQUALS 
+%nonassoc PERIOD ELSE IN ARROW
 
 %left SEMICOLON
+
+%left COLONEQUALS
 
 %left AND
 %left OR
