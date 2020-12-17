@@ -1,2 +1,2 @@
-true: menhir, package(oUnit)
+true: menhir, package(oUnit), package(ANSITerminal)
 true: use_menhir
