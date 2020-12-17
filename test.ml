@@ -3,7 +3,6 @@
 open OUnit2
 open Lambdaast
 open Interp
-open Church
 
 (* Just the identity function *)
 let id_fun : lamcom = Lam (Var 0)

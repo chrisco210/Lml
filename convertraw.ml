@@ -4,7 +4,6 @@ open Ast
 open Lambdaast
 open Iast
 open Convertcps
-open Church
 
 (** [lambop_of_bop b] is the lambdaast version of a binary operator*)
 let lambop_of_bop (b : Ast.bop) : Lambdaast.bop = 

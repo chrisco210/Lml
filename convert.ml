@@ -4,7 +4,6 @@ open Ast
 open Lambdaast
 open Iast
 open Convertcps
-open Church
 
 (* L x . L y . L z . z x y *)
 let pair_list = Lam ("***x", Lam ("***y" ,Lam ("***z", App (App (Var "***z", Var "***x"), Var "***y"))))
