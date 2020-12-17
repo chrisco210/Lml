@@ -1,3 +1,4 @@
+(**  This module converts an intermediate AST to lambda calculus*)
 open Lambdaast
 open Iast
 

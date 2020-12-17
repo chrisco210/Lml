@@ -2,7 +2,7 @@ open Lambdaast
 open Pprint
 
 (* This, new and improved interpreter uses the environment model, because it is
-   faster.  Inspired by the one from assignment 6, but still written on our own.
+   faster.  Inspired by the one from assignment 6, but written on our own.
 *)
 
 

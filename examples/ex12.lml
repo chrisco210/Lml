@@ -1,12 +1,14 @@
-(* A simple example using while loops. *)
+(* A simple example using while loops in combination with references. *)
 let isPrime = fun n -> 
+  let foundDivisible = ref false in 
+  let current = ref (n - 1) in 
   if n = 1 then false else
     let isDivBy = fun a b -> (a / b) * b = a in 
-    set (false, n - 1);
-    while (get#2) > 1 do 
-      set (get#1 || (isDivBy n (get#2)), get#2 - 1)
+    while (!current) > 1 do 
+      foundDivisible := (!foundDivisible || (isDivBy n (!current)));
+      current := !current - 1
     done;
-~get#1 
+    ~ !foundDivisible
 in 
 isPrime 13
 (* Should output true *)

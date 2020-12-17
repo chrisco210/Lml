@@ -28,58 +28,21 @@ Running just `lml` will start a simple REPL interpreter to use interactively.
 Right now it is pretty simple, but we will work on improving it in the future
 sprints.
 
+You can run `lml raw` to start a REPL interpreter that directly converts lambda
+calculus expressions into De Bruijn notation without converting to CPS and state
+passing style.  
+
 ## Sample Programs
 
-Here are some sample programs to run:
+In the examples folder, there are a number of example programs featuring all
+of the features.  
 
-Factorial function using the Y combinator and lambda calculus notation:
-```
-let Y = L f . (L x . f (x x)) (L x . f (x x)) in
-let G = L f . L n . if n = 0 then 1 else n * (f (n - 1)) in
-let factorial = Y G in
-factorial 4
-```
-This evaluates to 4! = 24
-
-Functions keep their environments, as you would expect:
-```
-let x = 4 in
-let f = fun z -> z + 4 in
-let x = 10 in
-f 6
-```
-This evaluates to 10
-
-Functions can have any number of arguments:
-```
-let add = fun x y -> x + y in
-add 1 2
-```
-This evaluates to 3
-
-Partial application also works:
-```
-let add = fun x y -> x + y in
-let addtwo = add 2 in
-addtwo 2
-```
-This evaluates to 4
-
-You can also write explicit recursive functions.  The same factorial function
-as above can be written as:
-```
-let rec fact = fun n -> if n = 0 then 1 else n * fact (n - 1) in
-fact 4
-```
-Evaluates to 24 again
-
-More examples are available in the examples folder
 ## The ML language
 
 The ML language is defined with the following grammar:
 
 ```
-bop ::= + | - | * | < | > | <= | >= | = | != | ::
+bop ::= + | - | * | / | < | > | <= | >= | = | != | :: | && | || 
 uop ::= ~ | ~- | !
 
 e ::= (e)
@@ -94,11 +57,12 @@ e ::= (e)
       | e1; e2
       | ref e
       | e1 := e2
+      | get
+      | set e
       | x
       | []                   <-- Nil
       | L x . e
-      | let x = e
-      | (e1, e2)
+      | (e1, e2, ... en)
       | e#n
       | e1 bop e2
       | uop e
@@ -114,6 +78,8 @@ cons operator to append to a list, `e#n` extracts the `n`th item from a tuple
 negation, and `!` is dereferencing.
 
 You can do OCaml style comments using the `(* ocaml comment *)` syntax.
+
+One note is you cannot have blank lines in your written programs.
 
 ## Target Lambda calculus
 The target lambda calculus is De Bruijn lambda calculus extended with integers,
@@ -131,6 +97,8 @@ e ::= x
       | if e1 then e2 else e3
       | e1 bop e2
       | uop e
+bop ::= + | - | * | / | < | > | <= | >= | = | !=
+uop ::= ~-
 ```
 
 The lambda calculus is evaluated using big step call by name (lazy) evaluation.

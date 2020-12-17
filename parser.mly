@@ -101,11 +101,11 @@ open Ast
   for how to make function application left associative
  */
 %nonassoc LAMBDA  IF WHILE LET LETREC LPAREN FUN ID INT TRUE FALSE NOT NEG HD TL NIL UNIT CONTINUE BREAK REF  IS_NIL GET SET
-
+%nonassoc DEREF
 %nonassoc APP
 
 %nonassoc POUND
-%nonassoc DEREF
+
 
 
 %start <Ast.expr> prog

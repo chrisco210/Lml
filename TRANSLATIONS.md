@@ -52,4 +52,36 @@
 [[get]] = L k . L m . k m m
 
 [[set e]] = L k . L m . [[e]] (L k' . L m' . k () k') m
+
+[[ref e]] = [[
+  set (get#1 + 1, (get#1 e)::(get#2));
+  get#1 - 1
+]]
+
+[[deref e]] = [[
+  let rec f = fun n lst ->
+    if is_nil lst then 
+      unit
+    else if (n = (hd lst)#1) then
+      (hd lst)#2
+    else 
+      f n (tl lst)
+  in
+  f e get#2
+]]
+
+[[e1 := e2]] = [[
+  set (
+    get#1,
+    let rec f = fun n lst ->
+      if is_nil lst then
+        []
+      else if n = (hd lst)#1 then
+        (n, e2)::(f n (tl lst))
+      else 
+        (hd lst):: (f n (tl lst))
+    in
+    f e1 get#2
+  )
+]]
 ```

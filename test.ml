@@ -1,3 +1,5 @@
+(* Test cases *)
+
 open OUnit2
 open Lambdaast
 open Interp
@@ -212,6 +214,7 @@ let parse_tests = [
   make_parse_test "let x = ref 10 in x := 11; !x" (Let ("x", (Ref (Int 10)), Seq (Assign (Var "x", Int 11), (Deref (Var "x")))));
   make_parse_test "let x = ref (L x . x) in !x 5" (Let ("x", (Ref (Abs ("x", (Var "x")))), App (Deref (Var "x"), Int 5)));
   make_parse_test "!!x" (Deref (Deref (Var "x")));
+  make_parse_test "foundDivisible := !foundDivisible || (isDivBy n !current)" (Assign ((Var "foundDivisible"), Bop (Deref (Var "foundDivisible"), Or, App (App (Var "isDivBy", Var "n"), Deref (Var "current")))))
 ]
 
 (* Conversion and execution tests *)
@@ -352,9 +355,9 @@ let exec_tests = [
       |> assert_equal (Lambdaast.Int 1)
     );
   "Recursion with references" >:: (fun _ ->
-      "(set (fun x -> x));
-      let fact = fun n -> if n = 0 then 1 else n * (get (n - 1)) in 
-      (set (fact)); 
+      "let id = ref (fun x -> x) in
+      let fact = fun n -> if n = 0 then 1 else n * (!id (n - 1)) in 
+      id := fact; 
       fact 5" 
       |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 120)
     );
@@ -418,18 +421,22 @@ let exec_tests = [
       "let x = ref 10 in x := 11; !x" 
       |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 11)
     );
-  "Double ref" >:: (fun _ ->
-      "let x = ref (ref 10) in !!x"
-      |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 10)
-    );
-  "Double refs update" >:: (fun _ ->
-      "let x = ref (ref 10) in let y = ref (ref 20) in x := y; !!x" 
-      |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 20)
-    );
   "Multiple refs" >:: (fun _ ->
       "let x = ref 10 in let y = ref 20 in !y + !x" 
       |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 30)
-    )
+    );
+  "Reference to reference" >:: (fun _ ->
+      "let x = ref 10 in let y = ref x in !!y" 
+      |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 10);
+    );
+  "Reference to reference" >:: (fun _ ->
+      "let x = ref 10 in let y = ref 20 in let xx = ref x in let yy = ref y in xx := yy; !!!xx"
+      |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 20);
+    );
+  "Reference to reference" >:: (fun _ ->
+      "let x = ref 10 in let y = ref 20 in let xx = ref x in let yy = ref y in xx := !yy; !!xx"
+      |> parse |> convert |> eval |> assert_equal (Lambdaast.Int 20);
+    );
 ]
 
 let suite = "LML tests" >::: List.concat [

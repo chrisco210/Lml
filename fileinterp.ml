@@ -1,3 +1,4 @@
+(** This module interprets a file*)
 open Parse
 open Ast
 open Interp

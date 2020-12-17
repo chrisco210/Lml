@@ -1,3 +1,5 @@
+(** This module contains a functor for creating a repl with a given converter*)
+
 module type Converter = sig 
   open Ast
   open Lambdaast

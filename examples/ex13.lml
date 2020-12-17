@@ -1,0 +1,18 @@
+(* A more complex example program 
+   A Greedy truck filling program.  Trucks have maximum capacity K, the input is
+   given by a list of cargos with weights w1 ... wn.  The output is the number
+   of trucks required to carry the cargo, using the greedy assignment method.
+   You could do this recursively, or simulate an imperative language like this:
+*)
+let k = 10 in 
+let cargo = ref (2::9::3::5::5::5::1::[]) in 
+let numTrucks = ref 1 in 
+let currentTruckLoad = ref 0 in 
+while ~ (is_nil (!cargo)) do 
+  if (!currentTruckLoad) + (hd (!cargo)) <= k then 
+    currentTruckLoad := !currentTruckLoad + (hd !cargo); cargo := tl (!cargo)
+  else 
+    numTrucks := !numTrucks + 1; currentTruckLoad := 0
+done;
+!numTrucks
+(* Should output 5*)

@@ -1,3 +1,5 @@
+(* This module parses a string *)
+
 open Ast
 
 (** [parse s] is a Lml ast of the string [s]*)

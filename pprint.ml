@@ -1,3 +1,5 @@
+(** This module is a pretty printer for the lambda ast*)
+
 open Lambdaast
 
 let string_of_bop (b : bop) : string = match b with
