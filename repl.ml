@@ -66,21 +66,28 @@ e ::= (e)
       | true
       | false
 
-These generally do what you would expect them to do.  The `::` operator is a 
-cons operator to append to a list, `e#n` extracts the `n`th item from a tuple
-`e`. For unary operators,  `~` is logical negation, while `~-` is integer 
-negation, and `!` is dereferencing.
+These generally do what you would expect them to do.  The `::` opera-
+tor is a cons operator to append to a list, `e#n` extracts the `n`th 
+item from a tuple `e`. For unary operators,  `~` is logical negation,
+while `~-` is integer negation, and `!` is dereferencing.
 
-You can do OCaml style comments using the `(* ocaml comment *)` syntax.\n"))
+You can do OCaml style comments using `(* ocaml comment *)` syntax.\n"))
 
-  let rec eval_and_loop () = 
-    ANSITerminal.(print_string [cyan] ("---------------------------------------------------------------------------------------\n"));
+  let rec eval_and_loop (last:string) = 
+    ANSITerminal.(print_string [cyan] ("---------------------------------------------------------------------\n"));
     ANSITerminal.(print_string [green] (">  "));
     (* Exception handling based on https://ocaml.org/learn/tutorials/error_handling.html  *)
     let input = read_line () in
     begin
       match input with
       | "help" -> help ()
+      | "^" -> ANSITerminal.(print_string [green] ("-> ")); print_endline last;
+        begin
+          try last |> parse |> eval_and_print with
+            e -> let msg = Printexc.to_string e
+            and stack = Printexc.get_backtrace () in
+            ANSITerminal.(print_string [red] ("Error evaluating or parsing: " ^ msg ^ stack ^ "\n"))
+        end
       | _ -> 
         begin
           try input |> parse |> eval_and_print with
@@ -89,13 +96,14 @@ You can do OCaml style comments using the `(* ocaml comment *)` syntax.\n"))
             ANSITerminal.(print_string [red] ("Error evaluating or parsing: " ^ msg ^ stack ^ "\n"))
         end
     end;
-    eval_and_loop ()
+    eval_and_loop input
 
   let repl () = 
     ANSITerminal.(print_string [cyan] ("
----------------------------------------------------------------------------------------
-                                        LML REPL                                    
----------------------------------------------------------------------------------------
-Press ^C to quit, see README.md or type `help` for syntax help and some examples to run\n"));
-    eval_and_loop ()
+---------------------------------------------------------------------
+                               LML REPL                                    
+---------------------------------------------------------------------
+          Press ^C to quit, type `^` to repeat last command
+See README.md or type `help` for syntax help and some examples to run\n"));
+    eval_and_loop ""
 end
