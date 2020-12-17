@@ -31,9 +31,9 @@ module Make (C : Converter) : Repl = struct
 
   let eval_and_print (e : expr) : unit = let e' = C.convert e in 
     ANSITerminal.(print_string [green] ("-> "));
-    ANSITerminal.(print_string [white] ((string_of_exp e') ^ "\n"));
+    ANSITerminal.(print_string [default] ((string_of_exp e') ^ "\n"));
     ANSITerminal.(print_string [green] ("-> "));
-    ANSITerminal.(print_string [white] ((e' |> eval |> string_of_exp) ^ "\n"))
+    ANSITerminal.(print_string [default] ((e' |> eval |> string_of_exp) ^ "\n"))
 
   let help () =
     ANSITerminal.(print_string [yellow] ("
