@@ -38,31 +38,32 @@ module Make (C : Converter) : Repl = struct
   let help () =
     ANSITerminal.(print_string [yellow] ("
 The ML language is defined with the following grammar:
-
-bop ::= + | - | * | < | > | <= | >= | = | != | ::
+bop ::= + | - | * | / | < | > | <= | >= | = | != | :: | && | || 
 uop ::= ~ | ~- | !
 
 e ::= (e)
-
       | let x = e1 in e2
       | let rec x = e1 in e2
       | fun x1 ... xn -> e
       | e1 e2
       | if e1 then e2 else e3
       | while e1 do e2 done
+      | break
+      | continue
       | e1; e2
       | ref e
       | e1 := e2
+      | get
+      | set e
       | x
       | []                   <-- Nil
       | L x . e
-      | let x = e
-      | (e1, e2)
+      | (e1, e2, ... en)
       | e#n
       | e1 bop e2
       | uop e
       | n
-      | ()                   <-- Unit
+      | unit                   <-- Unit
       | true
       | false
 
