@@ -7,6 +7,7 @@
 let k = 10 in 
 let cargo = ref (2::9::3::5::5::5::1::[]) in 
 let numTrucks = ref 1 in 
+ 
 let currentTruckLoad = ref 0 in 
 while ~ (is_nil (!cargo)) do 
   if (!currentTruckLoad) + (hd (!cargo)) <= k then 
@@ -14,5 +15,6 @@ while ~ (is_nil (!cargo)) do
   else 
     numTrucks := !numTrucks + 1; currentTruckLoad := 0
 done;
+ 
 !numTrucks
 (* Should output 5*)

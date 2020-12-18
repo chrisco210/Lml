@@ -2,7 +2,8 @@
   open Parser
 }
 
-let white = [' ' '\t' '\n']+
+let white = [' ' '\t' ]+
+let newline = ['\r' '\n']
 let digit = ['0'-'9']
 let int = '-'? digit+
 let letter = ['a'-'z' 'A'-'Z']
@@ -12,6 +13,7 @@ let id = (varchars+ "'"?)
 rule read = 
   parse
   | white { read lexbuf }
+  | '\n' { read lexbuf }
   | "true" { TRUE }
   | "false" { FALSE }
   | "if" {IF}
@@ -63,10 +65,10 @@ rule read =
   | id { ID (Lexing.lexeme lexbuf) }
   | int { INT (int_of_string (Lexing.lexeme lexbuf)) }
   | eof { EOF }
+
 (*Comments are based on the 3110 A5 RML lexer*)
 and comment depth = parse
   | "(*" { comment (depth + 1) lexbuf }
   | "*)" { if depth = 0 then read lexbuf else comment (depth - 1) lexbuf }
-  | '\n' { Lexing.new_line lexbuf; comment depth lexbuf }
   | eof  { EOF }
   | _    { comment depth lexbuf }
