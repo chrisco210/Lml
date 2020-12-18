@@ -80,23 +80,26 @@ You can do OCaml style comments using `(* ocaml comment *)` syntax.\n"))
     let input = read_line () in
     begin
       match input with
-      | "help" -> help ()
-      | "^" -> ANSITerminal.(print_string [green] ("-> ")); print_endline last;
+      | "help" -> help (); eval_and_loop last
+      | "^" -> 
+        ANSITerminal.(print_string [green] ("-> ")); print_endline last;
         begin
           try last |> parse |> eval_and_print with
             e -> let msg = Printexc.to_string e
             and stack = Printexc.get_backtrace () in
             ANSITerminal.(print_string [red] ("Error evaluating or parsing: " ^ msg ^ stack ^ "\n"))
-        end
+        end;
+        eval_and_loop last
       | _ -> 
         begin
           try input |> parse |> eval_and_print with
             e -> let msg = Printexc.to_string e
             and stack = Printexc.get_backtrace () in
             ANSITerminal.(print_string [red] ("Error evaluating or parsing: " ^ msg ^ stack ^ "\n"))
-        end
-    end;
-    eval_and_loop input
+        end;
+        eval_and_loop input
+    end
+
 
   let repl () = 
     ANSITerminal.(print_string [cyan] ("
