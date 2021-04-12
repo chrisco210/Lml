@@ -23,8 +23,4 @@ let _ =
         let c = convert parsed in 
         let final = eval c in 
         final |> string_of_exp |> Js.string
-
-      val test = 0
-      method add a b = a + b
-
     end)

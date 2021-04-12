@@ -101,4 +101,5 @@ bop ::= + | - | * | / | < | > | <= | >= | = | !=
 uop ::= ~-
 ```
 
-The lambda calculus is evaluated using big step call by name (lazy) evaluation.
+## Online
+You can build a simple javascript binding by typing `make js`
