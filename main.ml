@@ -1,8 +1,10 @@
 open Repl
 open Fileinterp
 
-module DefaultRepl = Repl.Make(Convert)
-module RawRepl = Repl.Make(Convertraw)
+open Colorprinter
+
+module DefaultRepl = Repl.Make(Convert) (Colorprinter)
+module RawRepl = Repl.Make(Convertraw) (Colorprinter)
 
 type args = 
   | File of string 
