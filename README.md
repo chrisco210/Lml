@@ -52,8 +52,6 @@ e ::= (e)
       | e1 e2
       | if e1 then e2 else e3
       | while e1 do e2 done
-      | break
-      | continue
       | e1; e2
       | ref e
       | e1 := e2
