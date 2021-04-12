@@ -17,10 +17,15 @@ let eval_and_str (e : expr) : string * string =
 let _ = 
   Js.export "lml"
     (object%js
+      (** [interp str] is an object with the converted and final results of the 
+          interpreter*)
       method interp str = 
         let str = str |> Js.to_string in 
         let parsed = parse str in 
-        let c = convert parsed in 
-        let final = eval c in 
-        final |> string_of_exp |> Js.string
+        let converted = convert parsed in 
+        let final = eval converted in 
+        object%js 
+          val convert = converted |> string_of_exp |> Js.string
+          val result = final  |> string_of_exp |> Js.string
+        end
     end)
