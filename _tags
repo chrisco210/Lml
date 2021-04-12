@@ -1,2 +1,2 @@
-true: menhir, package(oUnit), package(ANSITerminal)
+true: menhir, package(oUnit), package(ANSITerminal), package(js_of_ocaml), package(js_of_ocaml.ppx), package(js_of_ocaml.ocamlbuild)
 true: use_menhir

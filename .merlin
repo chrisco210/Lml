@@ -2,3 +2,4 @@ B _build
 PKG oUnit
 PKG ANSITerminal
 PKG str
+PKG js_of_ocaml.ocamlbuild
